@@ -1,5 +1,5 @@
 /**
- * CogniCore - Main Entry Point v1.1.0
+ * CogniCore - Main Entry Point v1.2.0
  * A local-first, governed, recoverable agent runtime
  */
 
@@ -24,6 +24,7 @@ const RequestTracing = require('./utils/RequestTracing');
 let PersistentTaskManager = null;
 let PersistentLogManager = null;
 let PersistentPolicyManager = null;
+let PersistentBackupManager = null;
 let CogniDatabase = null;
 
 try {
@@ -33,6 +34,8 @@ try {
   PersistentLogManager = require('./persistence/PersistentLogManager');
   // eslint-disable-next-line global-require
   PersistentPolicyManager = require('./persistence/PersistentPolicyManager');
+  // eslint-disable-next-line global-require
+  PersistentBackupManager = require('./persistence/PersistentBackupManager');
   // eslint-disable-next-line global-require
   CogniDatabase = require('./persistence/Database');
 } catch (error) {
@@ -53,6 +56,7 @@ module.exports = {
   ...(PersistentTaskManager && { PersistentTaskManager }),
   ...(PersistentLogManager && { PersistentLogManager }),
   ...(PersistentPolicyManager && { PersistentPolicyManager }),
+  ...(PersistentBackupManager && { PersistentBackupManager }),
   ...(CogniDatabase && { CogniDatabase }),
   
   // Core infrastructure
@@ -107,7 +111,7 @@ module.exports = {
     const components = {
       personalityManager: new PersonalityManager(options),
       logManager: new LogManager(options),
-      backupManager: new BackupManager(options),
+      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆盖
       scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options)
     };
@@ -130,6 +134,12 @@ module.exports = {
     if (usePersistence && PersistentPolicyManager) {
       components.personalityManager = new PersistentPolicyManager(options);
       await components.personalityManager.initialize();
+    }
+    
+    // 使用持久化或内存版BackupManager
+    if (usePersistence && PersistentBackupManager) {
+      components.backupManager = new PersistentBackupManager(options);
+      await components.backupManager.initialize();
     }
     
     return components;
