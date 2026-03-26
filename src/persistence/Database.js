@@ -495,6 +495,144 @@ class CogniDatabase {
       throw error;
     }
   }
+
+  /**
+   * 插入数据到指定表
+   * @param {string} table - 表名
+   * @param {Object} data - 数据对象
+   * @returns {Object} 插入结果，包含lastInsertRowid
+   */
+  insert(table, data) {
+    if (this.db?.inMemoryFallback) {
+      return { lastInsertRowid: 0, changes: 0 };
+    }
+
+    try {
+      const columns = Object.keys(data);
+      const placeholders = columns.map(() => '?').join(', ');
+      const values = columns.map(col => data[col]);
+      
+      const sql = `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`;
+      
+      return this.run(sql, values);
+    } catch (error) {
+      console.error('Insert error:', error.message, { table, data });
+      throw error;
+    }
+  }
+
+  /**
+   * 根据ID获取记录
+   * @param {string} table - 表名
+   * @param {string|number} id - 记录ID
+   * @returns {Object|null} 记录或null
+   */
+  getById(table, id) {
+    if (this.db?.inMemoryFallback) {
+      return null;
+    }
+
+    try {
+      return this.get(`SELECT * FROM ${table} WHERE id = ?`, [id]);
+    } catch (error) {
+      console.error('GetById error:', error.message, { table, id });
+      throw error;
+    }
+  }
+
+  /**
+   * 获取表中所有记录
+   * @param {string} table - 表名
+   * @returns {Array} 记录数组
+   */
+  getAll(table) {
+    if (this.db?.inMemoryFallback) {
+      return [];
+    }
+
+    try {
+      return this.query(`SELECT * FROM ${table}`);
+    } catch (error) {
+      console.error('GetAll error:', error.message, { table });
+      throw error;
+    }
+  }
+
+  /**
+   * 更新指定记录
+   * @param {string} table - 表名
+   * @param {string|number} id - 记录ID
+   * @param {Object} data - 要更新的数据
+   * @returns {Object} 更新结果
+   */
+  update(table, id, data) {
+    if (this.db?.inMemoryFallback) {
+      return { changes: 0 };
+    }
+
+    try {
+      const columns = Object.keys(data);
+      const setClause = columns.map(col => `${col} = ?`).join(', ');
+      const values = columns.map(col => data[col]);
+      values.push(id); // WHERE id = ?
+      
+      const sql = `UPDATE ${table} SET ${setClause} WHERE id = ?`;
+      
+      return this.run(sql, values);
+    } catch (error) {
+      console.error('Update error:', error.message, { table, id, data });
+      throw error;
+    }
+  }
+
+  /**
+   * 删除记录
+   * @param {string} table - 表名
+   * @param {string} whereClause - WHERE条件（可选）
+   * @param {Array} whereParams - WHERE参数（可选）
+   * @returns {Object} 删除结果
+   */
+  delete(table, whereClause = '', whereParams = []) {
+    if (this.db?.inMemoryFallback) {
+      return { changes: 0 };
+    }
+
+    try {
+      const sql = whereClause 
+        ? `DELETE FROM ${table} WHERE ${whereClause}`
+        : `DELETE FROM ${table}`;
+      
+      return this.run(sql, whereParams);
+    } catch (error) {
+      console.error('Delete error:', error.message, { table, whereClause, whereParams });
+      throw error;
+    }
+  }
+
+  /**
+   * 统计记录数量
+   * @param {string} table - 表名
+   * @param {string} whereClause - WHERE条件（可选）
+   * @param {Array} whereParams - WHERE参数（可选）
+   * @returns {number} 记录数量
+   */
+  count(table, whereClause = '', whereParams = []) {
+    if (this.db?.inMemoryFallback) {
+      return 0;
+    }
+
+    try {
+      const sql = whereClause
+        ? `SELECT COUNT(*) as count FROM ${table} WHERE ${whereClause}`
+        : `SELECT COUNT(*) as count FROM ${table}`;
+      
+      const result = this.get(sql, whereParams);
+      return result?.count || 0;
+    } catch (error) {
+      console.error('Count error:', error.message, { table, whereClause, whereParams });
+      throw error;
+    }
+  }
 }
 
 module.exports = CogniDatabase;
