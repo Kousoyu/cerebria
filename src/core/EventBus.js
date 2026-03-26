@@ -16,7 +16,7 @@ class EventBus {
 
   emit(eventName, data) {
     if (this.events.has(eventName)) {
-      this.events.get(eventName).forEach(handler => handler(data));
+      this.events.get(eventName).forEach((handler) => handler(data));
     }
   }
 
@@ -24,7 +24,9 @@ class EventBus {
     if (this.events.has(eventName)) {
       const handlers = this.events.get(eventName);
       const index = handlers.indexOf(handler);
-      if (index > -1) handlers.splice(index, 1);
+      if (index > -1) {
+        handlers.splice(index, 1);
+      }
     }
   }
 

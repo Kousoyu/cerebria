@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ErrorHandler - Unified Error Handling
  */
 
@@ -11,7 +11,7 @@ class CogniCoreError extends Error {
 }
 
 class ErrorHandler {
-  static handle(error, context = {}) {
+  static handle(error, _context = {}) {
     return new CogniCoreError('UNKNOWN', error.message);
   }
 
