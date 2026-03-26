@@ -55,3 +55,7 @@ __snapshots__/
 
 # ESLint cache
 .eslintcache
+
+# Persistence demo and test data
+persistence-demo-data/
+persistence-test-data/

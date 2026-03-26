@@ -15,7 +15,8 @@
     "start": "node examples/basic_usage.js",
     "dev": "node --watch examples/basic_usage.js",
     "docker:build": "docker build -t cogni-core .",
-    "docker:run": "docker run --rm -it -p 3000:3000 -v $(pwd)/data:/app/data cogni-core"
+    "docker:run": "docker run --rm -it -p 3000:3000 -v $(pwd)/data:/app/data cogni-core",
+    "install-deps": "npm install better-sqlite3"
   },
   "keywords": [
     "agent-runtime",
@@ -49,7 +50,10 @@
     "README.md"
   ],
   "devDependencies": {
-    "jest": "^29.7.0",
-    "eslint": "^8.56.0"
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^9.6.0"
   }
 }
