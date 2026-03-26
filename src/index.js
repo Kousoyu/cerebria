@@ -22,11 +22,17 @@ const RequestTracing = require('./utils/RequestTracing');
 
 // 持久化模块（可能不可用）
 let PersistentTaskManager = null;
+let PersistentLogManager = null;
+let PersistentPolicyManager = null;
 let CogniDatabase = null;
 
 try {
   // eslint-disable-next-line global-require
   PersistentTaskManager = require('./persistence/PersistentTaskManager');
+  // eslint-disable-next-line global-require
+  PersistentLogManager = require('./persistence/PersistentLogManager');
+  // eslint-disable-next-line global-require
+  PersistentPolicyManager = require('./persistence/PersistentPolicyManager');
   // eslint-disable-next-line global-require
   CogniDatabase = require('./persistence/Database');
 } catch (error) {
@@ -45,6 +51,8 @@ module.exports = {
   
   // 持久化模块（如果可用）
   ...(PersistentTaskManager && { PersistentTaskManager }),
+  ...(PersistentLogManager && { PersistentLogManager }),
+  ...(PersistentPolicyManager && { PersistentPolicyManager }),
   ...(CogniDatabase && { CogniDatabase }),
   
   // Core infrastructure
@@ -110,6 +118,18 @@ module.exports = {
       await components.taskManager.initialize();
     } else {
       components.taskManager = new TaskManager(options);
+    }
+    
+    // 使用持久化或内存版LogManager
+    if (usePersistence && PersistentLogManager) {
+      components.logManager = new PersistentLogManager(options);
+      await components.logManager.initialize();
+    }
+    
+    // 使用持久化或内存版PolicyManager
+    if (usePersistence && PersistentPolicyManager) {
+      components.personalityManager = new PersistentPolicyManager(options);
+      await components.personalityManager.initialize();
     }
     
     return components;
