@@ -258,14 +258,11 @@ class CogniDatabase {
         version: 2,
         name: 'performance_optimizations',
         sql: `
-          -- 性能优化索引
+          -- 性能优化索引（CREATE INDEX IF NOT EXISTS 在SQLite 3.9+中支持）
           CREATE INDEX IF NOT EXISTS idx_tasks_updated ON tasks(updated_at);
           CREATE INDEX IF NOT EXISTS idx_policy_changes_created ON policy_changes(created_at);
           CREATE INDEX IF NOT EXISTS idx_backups_created ON backups(created_at);
           CREATE INDEX IF NOT EXISTS idx_logs_operation ON logs(operation);
-          
-          -- 添加更多约束
-          ALTER TABLE backups ADD COLUMN IF NOT EXISTS parent_backup_id TEXT REFERENCES backups(id);
           
           -- 更新统计信息
           ANALYZE;
@@ -328,15 +325,17 @@ class CogniDatabase {
 
   /**
    * 在事务中执行操作
+   * 返回一个函数，调用该函数执行事务
    */
   transaction(callback) {
     if (this.db?.inMemoryFallback) {
-      return callback();
+      // 对于内存回退模式，直接执行
+      return () => callback();
     }
 
     try {
-      const tx = this.db.transaction(callback);
-      return tx();
+      // better-sqlite3的transaction方法返回一个函数
+      return this.db.transaction(callback);
     } catch (error) {
       console.error('Transaction error:', error.message);
       throw error;
