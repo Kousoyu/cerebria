@@ -1,0 +1,16 @@
+﻿version: '3.8'
+
+services:
+  cogni-core:
+    build: .
+    container_name: cogni-core
+    environment:
+      COGNI_MODE: standard
+      COGNI_DATA_DIR: /app/data
+    volumes:
+      - cogni-data:/app/data
+    ports:
+      - "3000:3000"
+
+volumes:
+  cogni-data:
