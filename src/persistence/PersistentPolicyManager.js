@@ -62,7 +62,7 @@ class PersistentPolicyManager {
       name,
       version: 1,
       content: typeof content === 'string' ? content : JSON.stringify(content, null, 2),
-      is_active: options.isActive !== false, // 默认激活
+      is_active: options.isActive !== false ? 1 : 0, // 默认激活，转换为SQLite整数
       created_at: Date.now(),
       updated_at: Date.now(),
       created_by: options.createdBy || 'system'
