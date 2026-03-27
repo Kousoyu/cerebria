@@ -2,7 +2,7 @@
 
 **A local-first, governed, recoverable agent runtime**
 
-CogniCore is a cognitive runtime for building persistent, skill-driven, memory-aware AI systems that can run locally, evolve safely, and recover reliably.
+CogniCore is a local-first runtime for building persistent, skill-driven AI systems that can run locally, evolve safely, and recover reliably.
 
 [![Tests](https://github.com/Kousoyu/cogni-core/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cogni-core/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -10,18 +10,18 @@ CogniCore is a cognitive runtime for building persistent, skill-driven, memory-a
 
 ## 🎯 What is CogniCore?
 
-CogniCore is an **agent runtime and cognitive kernel** for building real AI systems with memory, skills, state, recovery, and governance. It began as the memory and skill foundation behind a personal assistant system, and is evolving into a reusable runtime that can power personal agents, coding agents, and domain-specific AI applications.
+CogniCore is a **local-first agent runtime** for building AI systems with tasks, skills, session state, recovery, and governance. It provides the execution and control layer for persistent agents, while remaining composable with dedicated subsystems such as memory engines.
 
 ### Core Principles
 - **Local-first** — Your runtime should work for a single user before it scales to a team.
 - **Governed** — Skills, mutations, and risky actions should have boundaries.
 - **Recoverable** — Long-running systems must survive interruption and restart cleanly.
-- **Extensible** — Memory, tools, policies, and interfaces should be pluggable.
+- **Extensible** — Memory engines, tools, policies, and interfaces should be pluggable.
 
 ### What CogniCore Is
 - An agent runtime
 - A cognitive kernel  
-- A memory and skill substrate
+- A host for pluggable memory engines and skills
 - A policy-aware execution layer
 
 ### What CogniCore Is Not
@@ -109,12 +109,12 @@ main();
                    │
 ┌─────────────────────────────────────────┐
 │           Runtime Core                  │
-│  (Task, Memory, Skill, State Mgmt)      │
+│  (Task, Skill, Session State, Execution)      │
 └─────────────────────────────────────────┘
                    │
 ┌─────────────────────────────────────────┐
 │           Persistence Layer             │
-│  (SQLite, File System, Backups)         │
+│  (Runtime State, File System, Backups)         │
 └─────────────────────────────────────────┘
 ```
 
@@ -210,7 +210,7 @@ CogniCore is open source software licensed under the [MIT License](./LICENSE).
 
 ### Phase 1: Foundation (Current)
 - ✅ Core runtime architecture
-- ✅ Basic task and memory management  
+- ✅ Basic task and session state management  
 - ✅ Event-driven design
 - 🔄 SQLite persistence integration
 - 🔄 Policy governance framework
