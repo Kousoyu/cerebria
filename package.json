@@ -58,5 +58,8 @@
   },
   "optionalDependencies": {
     "better-sqlite3": "^9.6.0"
+  },
+  "peerDependencies": {
+    "limbicdb": "^1.0.0-beta.1"
   }
 }

@@ -24,6 +24,14 @@ CogniCore is a **local-first agent runtime** for building AI systems with tasks,
 - A host for pluggable memory engines and skills
 - A policy-aware execution layer
 
+### Features
+
+* **Flexible Memory System**: Built-in `MemoryManager` with a pluggable backend architecture.
+  * **MockBackend**: Default, zero-dependency in-memory storage for development and testing.
+  * **LimbicDBBackend**: Optional, persistent storage powered by [limbicdb](https://github.com/Kousoyu/limbicdb) (SQLite-based).
+* **Task Management**: Robust task scheduling and state management.
+* **Governance & Recovery**: Built-in mechanisms for system stability.
+
 ### What CogniCore Is Not
 - Just a prompt wrapper
 - Just a skill plugin pack  
@@ -37,6 +45,19 @@ CogniCore is a **local-first agent runtime** for building AI systems with tasks,
 - npm or yarn
 
 ### Installation
+
+```bash
+npm install cogni-core
+```
+
+**Optional: Persistent Memory Support**
+If you want to use `LimbicDB` for persistent memory storage, you also need to install the peer dependency:
+
+```bash
+npm install limbicdb@beta
+```
+
+### Quick Start from Repository
 
 ```bash
 # Clone the repository
@@ -89,6 +110,48 @@ async function main() {
   // Get health report
   const health = await system.healthMonitor.generateReport();
   console.log('System health:', health);
+}
+
+main();
+```
+
+## 💾 Memory Management
+
+`cogni-core` provides a unified memory interface. You can choose your preferred backend.
+
+**Option A: Mock Backend (Default)**
+Suitable for testing or short-lived sessions. No database files are created.
+
+```javascript
+const { CogniCore } = require('cogni-core');
+
+async function main() {
+  // Initializes with MockBackend by default
+  const system = await CogniCore.initialize(); 
+  
+  await system.memoryManager.remember('User prefers dark mode', 'preference');
+  const result = await system.memoryManager.recall('dark mode');
+  console.log(result.memories);
+}
+
+main();
+```
+
+**Option B: LimbicDB Backend (Persistent)**
+Suitable for long-term memory persistence. Requires `limbicdb`.
+
+```javascript
+const { CogniCore } = require('cogni-core');
+
+async function main() {
+  // Initializes with LimbicDB (SQLite backed)
+  const system = await CogniCore.initializeWithLimbicDB({
+    memoryPath: './agent_memory.limbic' // Path to database file
+  });
+  
+  await system.memoryManager.remember('Project deadline is next Monday', 'fact');
+  
+  // ... existing logic
 }
 
 main();
@@ -185,6 +248,17 @@ CMD ["npm", "start"]
 See `docker-compose.yml` for complete orchestration example.
 
 ## 📚 Documentation
+
+### MemoryManager API
+
+* `remember(content: string, type?: MemoryType): Promise<Memory>`
+  * Stores a new memory. `type` can be `'fact'`, `'episode'`, `'preference'`, `'procedure'`, or `'goal'`.
+* `recall(query: string, options?: RecallOptions): Promise<RecallResult>`
+  * Retrieves memories based on a query. Supports filtering by `types` and `limit`.
+* `forget(id: string): Promise<void>`
+  * Removes a specific memory by ID.
+
+### Full Documentation
 
 - [API Reference](./docs/API_REFERENCE.md) - Complete API documentation
 - [Configuration Guide](./docs/CONFIGURATION.md) - Configuration options
