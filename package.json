@@ -11,7 +11,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/**/*.js tests/**/*.js",
-    "build": "echo 'No build step required for Node.js project'",
+    "build": "tsc",
     "start": "node examples/basic_usage.js",
     "dev": "node --watch examples/basic_usage.js",
     "docker:build": "docker build -t cerebria .",
