@@ -1,6 +1,6 @@
 {
   "name": "cerebria",
-  "version": "1.0.0-alpha.1",
+  "version": "0.1.0",
   "description": "The Cognitive Core for Autonomous Agents",
   "main": "index.js",
   "exports": {
