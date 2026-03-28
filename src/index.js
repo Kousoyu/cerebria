@@ -9,6 +9,7 @@ const LogManager = require('./log_manager');
 const BackupManager = require('./backup_manager');
 const IntelligentScheduler = require('./scheduler');
 const HealthMonitor = require('./health_monitor');
+const { MemoryManager } = require('./../dist/memory/MemoryManager');
 
 // Core infrastructure modules
 const ConfigManager = require('./core/ConfigManager');
@@ -51,6 +52,7 @@ module.exports = {
   BackupManager,
   IntelligentScheduler,
   HealthMonitor,
+  MemoryManager,
   
   // 持久化模块（如果可用）
   ...(PersistentTaskManager && { PersistentTaskManager }),
@@ -86,7 +88,8 @@ module.exports = {
       logManager: new LogManager(options),
       backupManager: new BackupManager(options),
       scheduler: new IntelligentScheduler(options),
-      healthMonitor: new HealthMonitor(options)
+      healthMonitor: new HealthMonitor(options),
+      memoryManager: new MemoryManager()
     };
   },
   
