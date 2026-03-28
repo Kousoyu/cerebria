@@ -1,17 +1,42 @@
 // src/memory/backends/LimbicDBBackend.ts
-import { open } from 'limbicdb'
 import { MemoryBackend, Memory, MemoryType, RecallOptions, RecallResult } from '../types'
 
+// Dynamically require limbicdb to handle peer dependency
+function loadLimbicDB() {
+  try {
+    return require('limbicdb');
+  } catch (error) {
+    throw new Error('limbicdb is not installed. Please install it with: npm install limbicdb@beta');
+  }
+}
+
 export class LimbicDBBackend implements MemoryBackend {
-  private db: ReturnType<typeof open>
+  private db: any;
 
   constructor(path = './agent.limbic') {
-    this.db = open(path)
+    // We'll initialize the database lazily when first used
+    // This allows the constructor to succeed even if limbicdb isn't installed
+    // The actual initialization happens in the first method call
+    this.db = null;
+    this.dbPath = path;
+  }
+
+  private dbPath: string;
+  private initialized = false;
+
+  private ensureInitialized(): void {
+    if (!this.initialized) {
+      const { open } = loadLimbicDB();
+      this.db = open(this.dbPath);
+      this.initialized = true;
+    }
   }
 
   async remember(content: string, type: MemoryType = 'fact'): Promise<Memory> {
+    await this.ensureInitialized();
+    
     // limbicdb automatically classifies memory, but we can override with kind
-    const kindMap: Record<MemoryType, any> = {
+    const kindMap: Record<MemoryType, string> = {
       fact: 'fact',
       episode: 'episode', 
       preference: 'preference',
@@ -19,26 +44,27 @@ export class LimbicDBBackend implements MemoryBackend {
       goal: 'goal'
     }
     
-    await this.db.remember(content, { kind: kindMap[type] })
+    // limbicdb's remember returns the actual memory object with real ID
+    const limbicMemory = await this.db.remember(content, { kind: kindMap[type] });
     
-    // Create Memory object that matches our interface
-    // Note: We don't have the actual ID from limbicdb, so we use a placeholder
-    // In a real implementation, we'd need to get the actual memory ID from limbicdb
     return {
-      id: `limbic_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`,
-      content,
-      timestamp: Date.now(),
-      type
-    }
+      id: limbicMemory.id,
+      content: limbicMemory.content,
+      timestamp: limbicMemory.createdAt,
+      type: limbicMemory.kind as MemoryType,
+      metadata: limbicMemory.meta
+    };
   }
 
   async recall(query: string, options?: RecallOptions): Promise<RecallResult> {
-    const start = Date.now()
+    await this.ensureInitialized();
+    
+    const start = Date.now();
     
     // Convert our options to limbicdb options
-    const limbicOptions: any = {}
+    const limbicOptions: any = {};
     if (options?.limit) {
-      limbicOptions.limit = options.limit
+      limbicOptions.limit = options.limit;
     }
     if (options?.types) {
       // Map our types to limbicdb kinds
@@ -48,21 +74,21 @@ export class LimbicDBBackend implements MemoryBackend {
         preference: 'preference', 
         procedure: 'procedure',
         goal: 'goal'
-      }
-      limbicOptions.kind = options.types.map(t => kindMap[t])
+      };
+      limbicOptions.kind = options.types.map(t => kindMap[t]);
     }
     
     // Call limbicdb recall
-    const result = await this.db.recall(query, limbicOptions)
+    const result = await this.db.recall(query, limbicOptions);
     
     // Convert limbicdb memories to our Memory interface
-    const memories: Memory[] = result.memories.map(mem => ({
+    const memories: Memory[] = result.memories.map((mem: any) => ({
       id: mem.id,
       content: mem.content,
       timestamp: mem.createdAt,
       type: mem.kind as MemoryType,
       metadata: mem.meta
-    }))
+    }));
     
     return {
       memories,
@@ -71,15 +97,19 @@ export class LimbicDBBackend implements MemoryBackend {
         query,
         latencyMs: Date.now() - start
       }
-    }
+    };
   }
 
   async forget(id: string): Promise<void> {
+    await this.ensureInitialized();
     // limbicdb's forget requires filters, so we use id filter
-    await this.db.forget({ ids: [id] })
+    await this.db.forget({ ids: [id] });
   }
 
   async close(): Promise<void> {
-    await this.db.close()
+    if (this.initialized) {
+      await this.db.close();
+      this.initialized = false;
+    }
   }
 }
