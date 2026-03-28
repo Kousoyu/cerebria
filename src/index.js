@@ -48,6 +48,7 @@ try {
 class Cerebria {
   static async initialize(options = {}) {
     const config = options.mode || 'standard';
+    const memoryManager = new MemoryManager();
     return {
       taskManager: new TaskManager(options),
       personalityManager: new PersonalityManager(options),
@@ -55,7 +56,8 @@ class Cerebria {
       backupManager: new BackupManager(options),
       scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options),
-      memoryManager: new MemoryManager()
+      memoryManager,
+      get memory() { return memoryManager; }
     };
   }
   
@@ -64,6 +66,7 @@ class Cerebria {
     
     const config = options.mode || 'standard';
     const memoryPath = options.memoryPath || './agent.limbic';
+    const memoryManager = await createLimbicDBMemoryManager(memoryPath);
     
     return {
       taskManager: new TaskManager(options),
@@ -72,7 +75,8 @@ class Cerebria {
       backupManager: new BackupManager(options),
       scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options),
-      memoryManager: await createLimbicDBMemoryManager(memoryPath)
+      memoryManager,
+      get memory() { return memoryManager; }
     };
   }
   
