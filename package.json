@@ -1,5 +1,5 @@
 {
-  "name": "cerebria",
+  "name": "@kousoyu/cerebria",
   "version": "0.1.0-alpha.1",
   "description": "The Cognitive Core for Autonomous Agents",
   "main": "index.js",
