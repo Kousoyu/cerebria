@@ -43,6 +43,7 @@
   "files": [
     "index.js",
     "src/",
+    "dist/",
     "config/",
     "examples/",
     "docs/",
