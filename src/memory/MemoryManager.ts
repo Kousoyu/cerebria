@@ -25,3 +25,9 @@ export class MemoryManager {
     return this.backend.close()
   }
 }
+
+// Helper function to create MemoryManager with LimbicDB backend
+export async function createLimbicDBMemoryManager(path?: string): Promise<MemoryManager> {
+  const { LimbicDBBackend } = await import('./backends/LimbicDBBackend');
+  return new MemoryManager(new LimbicDBBackend(path));
+}

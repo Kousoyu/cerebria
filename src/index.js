@@ -94,6 +94,31 @@ module.exports = {
   },
   
   /**
+   * Initialize the CogniCore system with LimbicDB memory backend
+   * @param {Object} options - Configuration options
+   * @param {string} [options.mode='standard'] - Operation mode
+   * @param {string} [options.dataDir='./data'] - Data directory
+   * @param {string} [options.memoryPath='./agent.limbic'] - LimbicDB file path
+   * @returns {Promise<Object>} Initialized system components
+   */
+  async initializeWithLimbicDB(options = {}) {
+    const { MemoryManager, createLimbicDBMemoryManager } = require('./../dist/memory/MemoryManager');
+    
+    const config = options.mode || 'standard';
+    const memoryPath = options.memoryPath || './agent.limbic';
+    
+    return {
+      taskManager: new TaskManager(options),
+      personalityManager: new PersonalityManager(options),
+      logManager: new LogManager(options),
+      backupManager: new BackupManager(options),
+      scheduler: new IntelligentScheduler(options),
+      healthMonitor: new HealthMonitor(options),
+      memoryManager: await createLimbicDBMemoryManager(memoryPath)
+    };
+  },
+  
+  /**
    * Initialize the CogniCore system with persistence (if available)
    * @param {Object} options - Configuration options
    * @param {string} [options.mode='standard'] - Operation mode
