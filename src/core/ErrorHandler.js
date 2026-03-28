@@ -2,17 +2,17 @@
  * ErrorHandler - Unified Error Handling
  */
 
-class CogniCoreError extends Error {
+class CerebriaError extends Error {
   constructor(code, message) {
     super(message);
     this.code = code;
-    this.name = 'CogniCoreError';
+    this.name = 'CerebriaError';
   }
 }
 
 class ErrorHandler {
   static handle(error, _context = {}) {
-    return new CogniCoreError('UNKNOWN', error.message);
+    return new CerebriaError('UNKNOWN', error.message);
   }
 
   static getSuggestedRecovery(error) {
@@ -23,4 +23,4 @@ class ErrorHandler {
   }
 }
 
-module.exports = { ErrorHandler, CogniCoreError };
+module.exports = { ErrorHandler, CerebriaError };

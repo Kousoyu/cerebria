@@ -1,16 +1,16 @@
-# CogniCore
+# Cerebria
 
 **一个本地优先、可治理、可恢复的代理运行时**
 
-CogniCore 是一个本地优先的运行时，用于构建持久的、技能驱动的 AI 系统，可以在本地运行、安全演进并可靠恢复。
+Cerebria 是一个本地优先的运行时，用于构建持久的、技能驱动的 AI 系统，可以在本地运行、安全演进并可靠恢复。
 
-[![Tests](https://github.com/Kousoyu/cogni-core/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cogni-core/actions/workflows/test.yml)
+[![Tests](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
 
-## 🎯 什么是 CogniCore？
+## 🎯 什么是 Cerebria？
 
-CogniCore 是一个**本地优先的代理运行时**，用于构建具有任务、技能、会话状态、恢复和治理功能的 AI 系统。它为持久代理提供执行和控制层，同时保持与专用子系统（如记忆引擎）的可组合性。
+Cerebria 是一个**本地优先的代理运行时**，用于构建具有任务、技能、会话状态、恢复和治理功能的 AI 系统。它为持久代理提供执行和控制层，同时保持与专用子系统（如记忆引擎）的可组合性。
 
 ### 核心原则
 - **本地优先** — 您的运行时应该先为单个用户工作，然后再扩展到团队。
@@ -18,13 +18,13 @@ CogniCore 是一个**本地优先的代理运行时**，用于构建具有任务
 - **可恢复** — 长期运行的系统必须能够从中断中干净地重启。
 - **可扩展** — 记忆引擎、工具、策略和接口应该是可插拔的。
 
-### CogniCore 是什么
+### Cerebria 是什么
 - 一个代理运行时
 - 一个认知内核  
 - 可插拔记忆引擎和技能的宿主
 - 一个策略感知的执行层
 
-### CogniCore 不是什么
+### Cerebria 不是什么
 - 仅仅是一个提示包装器
 - 仅仅是一个技能插件包  
 - 仅仅是一个聊天机器人外壳
@@ -47,7 +47,7 @@ CogniCore 是一个**本地优先的代理运行时**，用于构建具有任务
 ### 安装
 
 ```bash
-npm install cogni-core
+npm install cerebria
 ```
 
 **可选：持久化记忆支持**
@@ -61,8 +61,8 @@ npm install limbicdb@beta
 
 ```bash
 # 克隆仓库
-git clone https://github.com/Kousoyu/cogni-core.git
-cd cogni-core
+git clone https://github.com/Kousoyu/cerebria.git
+cd cerebria
 
 # 安装依赖
 npm install
@@ -74,11 +74,11 @@ npm start
 ## 📖 基本用法
 
 ```javascript
-const CogniCore = require('cogni-core');
+const Cerebria = require('cerebria');
 
 async function main() {
   // 初始化系统
-  const system = await CogniCore.initialize({
+  const system = await Cerebria.initialize({
     mode: 'standard',
     dataDir: './data'
   });
@@ -103,17 +103,17 @@ main();
 
 ## 💾 记忆管理
 
-`cogni-core` 提供统一的记忆接口，你可以根据需求选择后端。
+`cerebria` 提供统一的记忆接口，你可以根据需求选择后端。
 
 **方案 A：Mock 后端（默认）**
 适合测试或短期会话，不会生成数据库文件。
 
 ```javascript
-const { CogniCore } = require('cogni-core');
+const { Cerebria } = require('cerebria');
 
 async function main() {
   // 默认使用 MockBackend 初始化
-  const system = await CogniCore.initialize(); 
+  const system = await Cerebria.initialize(); 
   
   await system.memoryManager.remember('用户喜欢深色模式', 'preference');
   const result = await system.memoryManager.recall('深色模式');
@@ -127,11 +127,11 @@ main();
 适合长期记忆存储。需要安装 `limbicdb`。
 
 ```javascript
-const { CogniCore } = require('cogni-core');
+const { Cerebria } = require('cerebria');
 
 async function main() {
   // 使用 LimbicDB 初始化
-  const system = await CogniCore.initializeWithLimbicDB({
+  const system = await Cerebria.initializeWithLimbicDB({
     memoryPath: './agent_memory.limbic' // 数据库文件路径
   });
   
@@ -177,7 +177,7 @@ main();
 
 ## ⚙️ 配置
 
-CogniCore 支持三种操作模式：
+Cerebria 支持三种操作模式：
 
 | 模式 | 使用场景 | 内存 | 缓存大小 | 最大备份数 |
 |------|----------|--------|------------|-------------|
@@ -188,13 +188,13 @@ CogniCore 支持三种操作模式：
 通过环境变量配置：
 ```bash
 COGNI_MODE=performance
-COGNI_DATA_DIR=/var/lib/cogni-core
+COGNI_DATA_DIR=/var/lib/cerebria
 COGNI_LOGGING_LEVEL=DEBUG
 ```
 
 或以编程方式：
 ```javascript
-const { ConfigManager } = require('cogni-core');
+const { ConfigManager } = require('cerebria');
 const config = new ConfigManager('standard');
 ```
 
@@ -218,7 +218,7 @@ npm run build
 
 ## 🐳 Docker 部署
 
-CogniCore 针对容器化部署进行了优化：
+Cerebria 针对容器化部署进行了优化：
 
 ```dockerfile
 FROM node:20-alpine
@@ -264,7 +264,7 @@ CMD ["npm", "start"]
 
 ## 📄 许可证
 
-CogniCore 是根据 [MIT 许可证](./LICENSE) 授权的开源软件。
+Cerebria 是根据 [MIT 许可证](./LICENSE) 授权的开源软件。
 
 ## 🗺️ 路线图
 
@@ -289,10 +289,10 @@ CogniCore 是根据 [MIT 许可证](./LICENSE) 授权的开源软件。
 
 ## 🙏 致谢
 
-CogniCore 基于更广泛的 AI 代理生态系统的理念构建，包括来自 OpenClaw 记忆系统、LangGraph 的持久执行模式以及 MCP 标准化工作的启发。
+Cerebria 基于更广泛的 AI 代理生态系统的理念构建，包括来自 OpenClaw 记忆系统、LangGraph 的持久执行模式以及 MCP 标准化工作的启发。
 
 ---
 
 **先构建运行时，再构建助手。**
 
-*CogniCore 是代理之下的层。*
+*Cerebria 是代理之下的层。*

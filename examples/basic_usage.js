@@ -1,11 +1,11 @@
-﻿const CogniCore = require('../src/index.js');
+﻿const Cerebria = require('../src/index.js');
 
 async function main() {
-  console.log('🚀 CogniCore v1.0.0 - Basic Usage');
+  console.log('🚀 Cerebria v1.0.0 - Basic Usage');
   console.log('==================================');
 
   try {
-    const system = await CogniCore.initialize({
+    const system = await Cerebria.initialize({
       mode: 'standard',
       dataDir: './example-data'
     });

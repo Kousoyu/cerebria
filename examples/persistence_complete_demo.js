@@ -7,7 +7,7 @@ const { initializeWithPersistence } = require('../src/index');
 
 async function runCompleteDemo() {
   console.log(`
-🚀 CogniCore Persistence Complete Demo
+🚀 Cerebria Persistence Complete Demo
 ========================================
 📊 Testing all persistent managers in a unified system
 `);

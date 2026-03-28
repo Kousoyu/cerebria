@@ -1,17 +1,17 @@
 /**
- * CogniCore持久化演示
+ * Cerebria持久化演示
  * 展示如何使用SQLite持久化存储任务和系统状态
  */
 
-const CogniCore = require('../src/index.js');
+const Cerebria = require('../src/index.js');
 
 async function persistenceDemo() {
-  console.log('🚀 CogniCore Persistence Demo');
+  console.log('🚀 Cerebria Persistence Demo');
   console.log('==================================');
   
   try {
     // 检查持久化是否可用
-    const persistenceAvailable = CogniCore.isPersistenceAvailable();
+    const persistenceAvailable = Cerebria.isPersistenceAvailable();
     console.log(`📊 Persistence available: ${persistenceAvailable ? '✅ Yes' : '❌ No'}`);
     
     if (!persistenceAvailable) {
@@ -22,12 +22,12 @@ async function persistenceDemo() {
     
     // 使用持久化初始化（如果可用）
     const system = persistenceAvailable 
-      ? await CogniCore.initializeWithPersistence({
+      ? await Cerebria.initializeWithPersistence({
           mode: 'standard',
           dataDir: './persistence-demo-data',
           persistent: true
         })
-      : await CogniCore.initialize({
+      : await Cerebria.initialize({
           mode: 'standard',
           dataDir: './persistence-demo-data'
         });

@@ -1,7 +1,7 @@
 {
-  "name": "cogni-core",
+  "name": "cerebria",
   "version": "1.3.0-beta.1",
-  "description": "Local-first agent runtime for orchestration, governance, and recovery.",
+  "description": "The Cognitive Core for Autonomous Agents",
   "main": "index.js",
   "exports": {
     ".": "./index.js",
@@ -14,8 +14,8 @@
     "build": "echo 'No build step required for Node.js project'",
     "start": "node examples/basic_usage.js",
     "dev": "node --watch examples/basic_usage.js",
-    "docker:build": "docker build -t cogni-core .",
-    "docker:run": "docker run --rm -it -p 3000:3000 -v $(pwd)/data:/app/data cogni-core",
+    "docker:build": "docker build -t cerebria .",
+    "docker:run": "docker run --rm -it -p 3000:3000 -v $(pwd)/data:/app/data cerebria",
     "install-deps": "npm install better-sqlite3"
   },
   "keywords": [
@@ -31,11 +31,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kousoyu/cogni-core.git"
+    "url": "git+https://github.com/Kousoyu/cerebria.git"
   },
-  "homepage": "https://github.com/Kousoyu/cogni-core#readme",
+  "homepage": "https://github.com/Kousoyu/cerebria#readme",
   "bugs": {
-    "url": "https://github.com/Kousoyu/cogni-core/issues"
+    "url": "https://github.com/Kousoyu/cerebria/issues"
   },
   "engines": {
     "node": ">=18.0.0"

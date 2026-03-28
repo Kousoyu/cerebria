@@ -1,16 +1,16 @@
-# CogniCore
+# Cerebria
 
 **A local-first, governed, recoverable agent runtime**
 
-CogniCore is a local-first runtime for building persistent, skill-driven AI systems that can run locally, evolve safely, and recover reliably.
+Cerebria is a local-first runtime for building persistent, skill-driven AI systems that can run locally, evolve safely, and recover reliably.
 
-[![Tests](https://github.com/Kousoyu/cogni-core/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cogni-core/actions/workflows/test.yml)
+[![Tests](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
 
-## 🎯 What is CogniCore?
+## 🎯 What is Cerebria?
 
-CogniCore is a **local-first agent runtime** for building AI systems with tasks, skills, session state, recovery, and governance. It provides the execution and control layer for persistent agents, while remaining composable with dedicated subsystems such as memory engines.
+Cerebria is a **local-first agent runtime** for building AI systems with tasks, skills, session state, recovery, and governance. It provides the execution and control layer for persistent agents, while remaining composable with dedicated subsystems such as memory engines.
 
 ### Core Principles
 - **Local-first** — Your runtime should work for a single user before it scales to a team.
@@ -18,7 +18,7 @@ CogniCore is a **local-first agent runtime** for building AI systems with tasks,
 - **Recoverable** — Long-running systems must survive interruption and restart cleanly.
 - **Extensible** — Memory engines, tools, policies, and interfaces should be pluggable.
 
-### What CogniCore Is
+### What Cerebria Is
 - An agent runtime
 - A cognitive kernel  
 - A host for pluggable memory engines and skills
@@ -32,7 +32,7 @@ CogniCore is a **local-first agent runtime** for building AI systems with tasks,
 * **Task Management**: Robust task scheduling and state management.
 * **Governance & Recovery**: Built-in mechanisms for system stability.
 
-### What CogniCore Is Not
+### What Cerebria Is Not
 - Just a prompt wrapper
 - Just a skill plugin pack  
 - Just a chatbot shell
@@ -47,7 +47,7 @@ CogniCore is a **local-first agent runtime** for building AI systems with tasks,
 ### Installation
 
 ```bash
-npm install cogni-core
+npm install cerebria
 ```
 
 **Optional: Persistent Memory Support**
@@ -61,8 +61,8 @@ npm install limbicdb@beta
 
 ```bash
 # Clone the repository
-git clone https://github.com/Kousoyu/cogni-core.git
-cd cogni-core
+git clone https://github.com/Kousoyu/cerebria.git
+cd cerebria
 
 # Install dependencies
 npm install
@@ -82,17 +82,17 @@ docker run --rm -it \
   -e COGNI_MODE=standard \
   -v cogni-data:/app/data \
   -p 3000:3000 \
-  ghcr.io/kousoyu/cogni-core:latest
+  ghcr.io/kousoyu/cerebria:latest
 ```
 
 ## 📖 Basic Usage
 
 ```javascript
-const CogniCore = require('cogni-core');
+const Cerebria = require('cerebria');
 
 async function main() {
   // Initialize the system
-  const system = await CogniCore.initialize({
+  const system = await Cerebria.initialize({
     mode: 'standard',
     dataDir: './data'
   });
@@ -117,17 +117,17 @@ main();
 
 ## 💾 Memory Management
 
-`cogni-core` provides a unified memory interface. You can choose your preferred backend.
+`cerebria` provides a unified memory interface. You can choose your preferred backend.
 
 **Option A: Mock Backend (Default)**
 Suitable for testing or short-lived sessions. No database files are created.
 
 ```javascript
-const { CogniCore } = require('cogni-core');
+const { Cerebria } = require('cerebria');
 
 async function main() {
   // Initializes with MockBackend by default
-  const system = await CogniCore.initialize(); 
+  const system = await Cerebria.initialize(); 
   
   await system.memoryManager.remember('User prefers dark mode', 'preference');
   const result = await system.memoryManager.recall('dark mode');
@@ -141,11 +141,11 @@ main();
 Suitable for long-term memory persistence. Requires `limbicdb`.
 
 ```javascript
-const { CogniCore } = require('cogni-core');
+const { Cerebria } = require('cerebria');
 
 async function main() {
   // Initializes with LimbicDB (SQLite backed)
-  const system = await CogniCore.initializeWithLimbicDB({
+  const system = await Cerebria.initializeWithLimbicDB({
     memoryPath: './agent_memory.limbic' // Path to database file
   });
   
@@ -191,7 +191,7 @@ main();
 
 ## ⚙️ Configuration
 
-CogniCore supports three operational modes:
+Cerebria supports three operational modes:
 
 | Mode | Use Case | Memory | Cache Size | Max Backups |
 |------|----------|--------|------------|-------------|
@@ -202,13 +202,13 @@ CogniCore supports three operational modes:
 Configure via environment variables:
 ```bash
 COGNI_MODE=performance
-COGNI_DATA_DIR=/var/lib/cogni-core
+COGNI_DATA_DIR=/var/lib/cerebria
 COGNI_LOGGING_LEVEL=DEBUG
 ```
 
 Or programmatically:
 ```javascript
-const { ConfigManager } = require('cogni-core');
+const { ConfigManager } = require('cerebria');
 const config = new ConfigManager('standard');
 ```
 
@@ -232,7 +232,7 @@ npm run build
 
 ## 🐳 Docker Deployment
 
-CogniCore is optimized for containerized deployment:
+Cerebria is optimized for containerized deployment:
 
 ```dockerfile
 FROM node:20-alpine
@@ -278,7 +278,7 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 
 ## 📄 License
 
-CogniCore is open source software licensed under the [MIT License](./LICENSE).
+Cerebria is open source software licensed under the [MIT License](./LICENSE).
 
 ## 🗺️ Roadmap
 
@@ -303,10 +303,10 @@ CogniCore is open source software licensed under the [MIT License](./LICENSE).
 
 ## 🙏 Acknowledgments
 
-CogniCore builds upon ideas from the broader AI agent ecosystem, including inspiration from OpenClaw memory systems, LangGraph's durable execution patterns, and the MCP standardization effort.
+Cerebria builds upon ideas from the broader AI agent ecosystem, including inspiration from OpenClaw memory systems, LangGraph's durable execution patterns, and the MCP standardization effort.
 
 ---
 
 **Build the assistant later. Build the runtime first.**
 
-*CogniCore is the layer beneath the agent.*
+*Cerebria is the layer beneath the agent.*

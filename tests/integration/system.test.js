@@ -1,10 +1,10 @@
-﻿const CogniCore = require('../../src/index');
+﻿const Cerebria = require('../../src/index');
 
-describe('CogniCore Integration', () => {
+describe('Cerebria Integration', () => {
   let system;
 
   beforeEach(async () => {
-    system = await CogniCore.initialize({
+    system = await Cerebria.initialize({
       mode: 'standard',
       dataDir: './test-data'
     });
