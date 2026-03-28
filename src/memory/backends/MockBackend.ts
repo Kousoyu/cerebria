@@ -1,4 +1,5 @@
 // src/memory/backends/MockBackend.ts
+import { randomUUID } from 'crypto'
 import { MemoryBackend, Memory, MemoryType, RecallOptions, RecallResult } from '../types'
 
 export class MockMemoryBackend implements MemoryBackend {
@@ -6,7 +7,7 @@ export class MockMemoryBackend implements MemoryBackend {
 
   async remember(content: string, type: MemoryType = 'fact'): Promise<Memory> {
     const mem: Memory = {
-      id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+      id: randomUUID(),
       content,
       timestamp: Date.now(),
       type,
