@@ -1,45 +1,26 @@
-﻿# Contributing to CogniCore
+# Contributing to Cerebria
 
-## Code of Conduct
-
-Be respectful and inclusive.
-
-## How to Contribute
-
-1. Fork the repository
-2. Create a feature branch (git checkout -b feature/amazing-feature)
-3. Commit changes (git commit -m 'Add amazing feature')
-4. Push to branch (git push origin feature/amazing-feature)
-5. Open a Pull Request
+First off, thanks for taking the time to contribute! 🧠✨
 
 ## Development Setup
 
-npm install
-npm test
+1. Fork and clone the repo.
+2. Install dependencies: `npm install`
+3. Run tests: `npm test`
 
-## Testing
+## Publishing Workflow (For Maintainers)
 
-npm test
-npm run test:coverage
+### Prerequisites
+- Node.js 18+ (for `crypto` module compatibility).
+- npm 9+ with Granular Access Token (if 2FA is enabled).
 
-## Code Style
+### Release Steps
+1. Ensure all tests pass: `npm test`
+2. Build the project: `npm run build`
+3. Update version: `npm version patch|minor|major`
+4. Publish: `npm publish --access public`
 
-- Use ES6+
-- Follow existing patterns
-- Add JSDoc comments
-- Write tests for new features
-
-## Commit Messages
-
-- Use present tense
-- Be descriptive
-- Reference issues when applicable
-
-## Reporting Bugs
-
-Use GitHub Issues with:
-- Clear title
-- Description
-- Steps to reproduce
-- Expected vs actual behavior
-- Environment details
+### Troubleshooting
+- **`ReferenceError: crypto is not defined`**: Ensure you are using `import { randomUUID } from 'node:crypto'`.
+- **`E403 Two-factor authentication...`**: Use a **Granular Access Token** with "Publish" permissions.
+- **`Provenance not supported`**: Add `provenance=false` to `.npmrc` for local publishing.

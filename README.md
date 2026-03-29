@@ -1,12 +1,15 @@
-# Cerebria
+# Cerebria 🧠
 
 **A local-first, governed, recoverable agent runtime**
 
 Cerebria is a local-first runtime for building persistent, skill-driven AI systems that can run locally, evolve safely, and recover reliably.
 
+[![Contributing](https://img.shields.io/badge/Contributing-guide-blue)](./CONTRIBUTING.md)
+[![npm version](https://img.shields.io/npm/v/cerebria.svg)](https://www.npmjs.com/package/cerebria)
+[![Downloads](https://img.shields.io/npm/dm/cerebria.svg)](https://www.npmjs.com/package/cerebria)
 [![Tests](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/node/v/cerebria.svg)](https://nodejs.org)
 
 ## 🎯 What is Cerebria?
 
