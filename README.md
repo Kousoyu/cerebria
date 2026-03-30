@@ -57,7 +57,7 @@ npm install cerebria
 If you want to use `LimbicDB` for persistent memory storage, you also need to install the peer dependency:
 
 ```bash
-npm install limbicdb@beta
+npm install limbicdb
 ```
 
 ### Quick Start from Repository
