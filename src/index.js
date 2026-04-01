@@ -132,7 +132,7 @@ class Cerebria {
   }
   
   static async start() {
-    console.log('🚀 Cerebria v1.3.0-beta.1 started - The Cognitive Core for Autonomous Agents');
+    console.log('🚀 Cerebria v1.2.0 started - A local-first, governed, recoverable agent runtime');
   }
 }
 
@@ -281,6 +281,6 @@ module.exports = {
    * @returns {Promise<void>}
    */
   async start() {
-    console.log('🚀 Cerebria v1.1.0 started - A local-first, governed, recoverable agent runtime');
+    console.log('🚀 Cerebria v1.2.0 started - A local-first, governed, recoverable agent runtime');
   }
 };

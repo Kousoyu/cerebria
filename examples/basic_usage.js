@@ -1,7 +1,7 @@
 ﻿const Cerebria = require('../src/index.js');
 
 async function main() {
-  console.log('🚀 Cerebria v1.0.0 - Basic Usage');
+  console.log('🚀 Cerebria v1.2.0 - Basic Usage');
   console.log('==================================');
 
   try {
