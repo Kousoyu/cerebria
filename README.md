@@ -1,31 +1,35 @@
-# Cerebria 🧠
+# Cerebria
 
-**A local-first, governed, recoverable agent runtime**
+> ⚠️ **Experimental project.**  
+> Cerebria is the reference runtime for [LimbicDB](https://github.com/Kousoyu/limbicdb).  
+> **New here? Start with LimbicDB first.**
 
-Cerebria is a local-first runtime for building persistent, skill-driven AI systems that can run locally, evolve safely, and recover reliably.
-
-[![Contributing](https://img.shields.io/badge/Contributing-guide-blue)](./CONTRIBUTING.md)
 [![npm version](https://img.shields.io/npm/v/cerebria.svg)](https://www.npmjs.com/package/cerebria)
 [![Downloads](https://img.shields.io/npm/dm/cerebria.svg)](https://www.npmjs.com/package/cerebria)
 [![Tests](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/node/v/cerebria.svg)](https://nodejs.org)
 
-## 🎯 What is Cerebria?
+Cerebria is a local-first runtime used to demonstrate how persistent agents can run with task state, recovery, and **debuggable memory powered by LimbicDB**.
 
-Cerebria is a **local-first agent runtime** for building AI systems with tasks, skills, session state, recovery, and governance. It provides the execution and control layer for persistent agents, while remaining composable with dedicated subsystems such as memory engines.
+## What Cerebria is
 
-### Core Principles
-- **Local-first** — Your runtime should work for a single user before it scales to a team.
-- **Governed** — Skills, mutations, and risky actions should have boundaries.
-- **Recoverable** — Long-running systems must survive interruption and restart cleanly.
-- **Extensible** — Memory engines, tools, policies, and interfaces should be pluggable.
+- A reference runtime for persistent local agents
+- A demo environment for integrating LimbicDB into an agent loop
+- An experimental runtime for task state, recovery, and governance ideas
 
-### What Cerebria Is
-- An agent runtime
-- A cognitive kernel  
-- A host for pluggable memory engines and skills
-- A policy-aware execution layer
+## What Cerebria is not
+
+- Not the main project to start with
+- Not a production-ready agent platform
+- Not a giant everything-framework
+
+## Relationship to LimbicDB
+
+- **LimbicDB** focuses on memory: what was remembered, what was recalled, and where memories conflict
+- **Cerebria** focuses on runtime behavior: how an agent executes, persists, and recovers
+
+If you want debuggable AI memory, use **LimbicDB**.  
+If you want to see one way to consume it inside a local runtime, explore **Cerebria**.
 
 ### Features
 
