@@ -57,6 +57,16 @@ If you want to see one way to consume it inside a local runtime, explore **Cereb
 npm install cerebria
 ```
 
+### 运行方式差异（源码运行 vs npm 包运行）
+
+- **npm 包运行（推荐给使用者）**
+  - 直接安装：`npm install cerebria`
+  - 使用的是已发布包内的 `dist/` 编译产物，无需本地 TypeScript 运行时。
+- **源码运行（推荐给贡献者）**
+  - 克隆仓库后先执行：`npm install`
+  - 优先使用 `dist/` 编译产物；若本地未构建，运行时会尝试通过 `ts-node/register/transpile-only` 加载 `src/memory/MemoryManager.ts`。
+  - 若两者都不可用会抛出结构化错误，请先执行：`npm run build`。
+
 **Optional: Persistent Memory Support**
 If you want to use `LimbicDB` for persistent memory storage, you also need to install the peer dependency:
 
@@ -73,6 +83,9 @@ cd cerebria
 
 # Install dependencies
 npm install
+
+# Build dist artifacts (recommended before running examples)
+npm run build
 
 # Run the basic example
 npm start
