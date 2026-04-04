@@ -9,7 +9,7 @@ const LogManager = require('./log_manager');
 const BackupManager = require('./backup_manager');
 const IntelligentScheduler = require('./scheduler');
 const HealthMonitor = require('./health_monitor');
-const { MemoryManager } = require('./../dist/memory/MemoryManager');
+const path = require('path');
 
 // Core infrastructure modules
 const ConfigManager = require('./core/ConfigManager');
@@ -20,6 +20,85 @@ const { ErrorHandler, CerebriaError } = require('./core/ErrorHandler');
 const Metrics = require('./core/Metrics');
 const { Validator, ValidationError } = require('./utils/Validator');
 const RequestTracing = require('./utils/RequestTracing');
+
+const MEMORY_MANAGER_DIST_PATH = './../dist/memory/MemoryManager';
+const MEMORY_MANAGER_TS_PATH = './memory/MemoryManager.ts';
+
+function createMemoryModuleLoadError({ attemptedTargets, distError, tsNodeError, tsSourceError }) {
+  const error = new Error(
+    `Failed to load MemoryManager module. Tried compiled output and development fallback.`
+  );
+  error.name = 'CerebriaMemoryModuleLoadError';
+  error.code = 'CEREBRIA_MEMORY_MANAGER_LOAD_FAILED';
+  error.details = {
+    attemptedTargets,
+    remediation: [
+      'Run `npm run build` to generate dist artifacts.',
+      'If you run from source, install dev dependencies and ensure `ts-node/register/transpile-only` is available.'
+    ],
+    distError: distError ? { name: distError.name, message: distError.message, code: distError.code } : null,
+    tsNodeError: tsNodeError ? { name: tsNodeError.name, message: tsNodeError.message, code: tsNodeError.code } : null,
+    tsSourceError: tsSourceError ? { name: tsSourceError.name, message: tsSourceError.message, code: tsSourceError.code } : null
+  };
+  return error;
+}
+
+function loadMemoryModule() {
+  const attemptedTargets = [];
+  let distError = null;
+  let tsNodeError = null;
+  let tsSourceError = null;
+
+  attemptedTargets.push(path.resolve(__dirname, MEMORY_MANAGER_DIST_PATH));
+  try {
+    // eslint-disable-next-line global-require
+    return require(MEMORY_MANAGER_DIST_PATH);
+  } catch (error) {
+    distError = error;
+  }
+
+  attemptedTargets.push('ts-node/register/transpile-only');
+  try {
+    // eslint-disable-next-line global-require
+    require('ts-node/register/transpile-only');
+  } catch (error) {
+    tsNodeError = error;
+  }
+
+  if (!tsNodeError) {
+    attemptedTargets.push(path.resolve(__dirname, MEMORY_MANAGER_TS_PATH));
+    try {
+      // eslint-disable-next-line global-require
+      return require(MEMORY_MANAGER_TS_PATH);
+    } catch (error) {
+      tsSourceError = error;
+    }
+  }
+
+  throw createMemoryModuleLoadError({ attemptedTargets, distError, tsNodeError, tsSourceError });
+}
+
+function getCreateLimbicDBMemoryManager(memoryModule) {
+  if (typeof memoryModule.createLimbicDBMemoryManager !== 'function') {
+    const error = new Error('createLimbicDBMemoryManager is not available in loaded MemoryManager module.');
+    error.name = 'CerebriaMemoryModuleLoadError';
+    error.code = 'CEREBRIA_MEMORY_MANAGER_EXPORT_MISSING';
+    error.details = {
+      expectedExport: 'createLimbicDBMemoryManager',
+      remediation: [
+        'Run `npm run build` to generate dist artifacts.',
+        'Verify memory module exports in dist and source are aligned.'
+      ]
+    };
+    throw error;
+  }
+
+  return memoryModule.createLimbicDBMemoryManager;
+}
+
+const memoryModule = loadMemoryModule();
+const { MemoryManager } = memoryModule;
+const createLimbicDBMemoryManager = getCreateLimbicDBMemoryManager(memoryModule);
 
 // 持久化模块（可能不可用）
 let PersistentTaskManager = null;
@@ -62,8 +141,6 @@ class Cerebria {
   }
   
   static async initializeWithLimbicDB(options = {}) {
-    const { MemoryManager, createLimbicDBMemoryManager } = require('./../dist/memory/MemoryManager');
-    
     const config = options.mode || 'standard';
     const memoryPath = options.memoryPath || './agent.limbic';
     const memoryManager = await createLimbicDBMemoryManager(memoryPath);
@@ -197,8 +274,6 @@ module.exports = {
    * @returns {Promise<Object>} Initialized system components
    */
   async initializeWithLimbicDB(options = {}) {
-    const { MemoryManager, createLimbicDBMemoryManager } = require('./../dist/memory/MemoryManager');
-    
     const config = options.mode || 'standard';
     const memoryPath = options.memoryPath || './agent.limbic';
     
