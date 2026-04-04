@@ -105,6 +105,11 @@ export class WorkerPool {
   }
 
   private sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => {
+      const timer = setTimeout(resolve, ms);
+      if (timer.unref) {
+        timer.unref(); // Prevent Jest and Node loop from hanging
+      }
+    });
   }
 }

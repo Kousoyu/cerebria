@@ -22,6 +22,7 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-unsafe-function-type": "off",
     "no-useless-catch": "off",
+    "arrow-parens": "off",
     "prettier/prettier": "off"
   }
 }

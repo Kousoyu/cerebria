@@ -14,7 +14,8 @@ describe('Crash Recovery Engine', () => {
     scheduler = new IntelligentScheduler();
     scheduler.start(); // Set isRunning to true so it processes tasks
 
-    jest.useFakeTimers();
+    // Real timers for worker pool
+    jest.useRealTimers();
 
     // Mock DB layer manually to simulate a crash scenario
     taskManager.initialized = true;
@@ -35,6 +36,7 @@ describe('Crash Recovery Engine', () => {
   });
 
   afterEach(() => {
+    scheduler.stop();
     jest.restoreAllMocks();
   });
 
@@ -50,7 +52,7 @@ describe('Crash Recovery Engine', () => {
     );
   });
 
-  it('should emit recovery events and trigger the scheduler', () => {
+  it('should emit recovery events and trigger the scheduler', async () => {
     const mockCallback = jest.fn();
     EventBus.getInstance().on('task:resumed', mockCallback);
 
@@ -59,8 +61,8 @@ describe('Crash Recovery Engine', () => {
       orphanedTasks: [{ id: 'task_crashed_1', title: 'Interrupted Task' }]
     });
 
-    // Fast-forward timers to trigger the setTimeout in scheduler.ts
-    jest.advanceTimersByTime(1100);
+    // Wait for the worker pool loop to execute (polling is 1000ms, wait 1500ms)
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     expect(mockCallback).toHaveBeenCalledWith(expect.objectContaining({ taskId: 'task_crashed_1' }));
   });
