@@ -1,32 +1,33 @@
+// @ts-nocheck
 /**
  * Cerebria - Main Entry Point v1.2.0
  * A local-first, governed, recoverable agent runtime
  */
 
-const TaskManager = require('./task_manager');
-const PersonalityManager = require('./personality_manager');
-const LogManager = require('./log_manager');
-const BackupManager = require('./backup_manager');
-const IntelligentScheduler = require('./scheduler');
-const HealthMonitor = require('./health_monitor');
-const { MemoryManager } = require('./../dist/memory/MemoryManager');
+import TaskManager  from './task_manager';
+import PersonalityManager  from './personality_manager';
+import LogManager  from './log_manager';
+import BackupManager  from './backup_manager';
+import IntelligentScheduler  from './scheduler';
+import HealthMonitor  from './health_monitor';
+import { MemoryManager  } from './memory/MemoryManager';
 
 // Core infrastructure modules
-const ConfigManager = require('./core/ConfigManager');
-const EventBus = require('./core/EventBus');
-const FileLock = require('./core/FileLock');
-const RetryManager = require('./core/RetryManager');
+import ConfigManager  from './core/ConfigManager';
+import EventBus  from './core/EventBus';
+import FileLock  from './core/FileLock';
+import RetryManager  from './core/RetryManager';
 const { ErrorHandler, CerebriaError } = require('./core/ErrorHandler');
-const Metrics = require('./core/Metrics');
+import Metrics  from './core/Metrics';
 const { Validator, ValidationError } = require('./utils/Validator');
-const RequestTracing = require('./utils/RequestTracing');
+import RequestTracing  from './utils/RequestTracing';
 
 // 持久化模块（可能不可用）
-let PersistentTaskManager = null;
-let PersistentLogManager = null;
-let PersistentPolicyManager = null;
-let PersistentBackupManager = null;
-let CogniDatabase = null;
+let PersistentTaskManager: any = null;
+let PersistentLogManager: any = null;
+let PersistentPolicyManager: any = null;
+let PersistentBackupManager: any = null;
+let CogniDatabase: any = null;
 
 try {
   // eslint-disable-next-line global-require
@@ -40,13 +41,13 @@ try {
   // eslint-disable-next-line global-require
   CogniDatabase = require('./persistence/Database');
 } catch (error) {
-  // 持久化模块可能不可用（缺少依赖或文件）
-  console.warn('⚠️  Persistent modules not available:', error.message);
+  // 持久化模块可能不可用（缺少依赖或文件�?  console.warn('⚠️  Persistent modules not available:', error.message);
 }
 
 // Main Cerebria class
 class Cerebria {
-  static async initialize(options = {}) {
+  [key: string]: any;
+  static async initialize(options: any = {}) {
     const config = options.mode || 'standard';
     const memoryManager = new MemoryManager();
     return {
@@ -61,8 +62,8 @@ class Cerebria {
     };
   }
   
-  static async initializeWithLimbicDB(options = {}) {
-    const { MemoryManager, createLimbicDBMemoryManager } = require('./../dist/memory/MemoryManager');
+  static async initializeWithLimbicDB(options: any = {}) {
+    const { MemoryManager, createLimbicDBMemoryManager } = require('./memory/MemoryManager');
     
     const config = options.mode || 'standard';
     const memoryPath = options.memoryPath || './agent.limbic';
@@ -80,7 +81,7 @@ class Cerebria {
     };
   }
   
-  static async initializeWithPersistence(options = {}) {
+  static async initializeWithPersistence(options: any = {}) {
     const config = options.mode || 'standard';
     const usePersistence = options.persistent !== false;
     
@@ -93,8 +94,7 @@ class Cerebria {
     const components = {
       personalityManager: new PersonalityManager(options),
       logManager: new LogManager(options),
-      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆盖
-      scheduler: new IntelligentScheduler(options),
+      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options)
     };
     
@@ -136,7 +136,7 @@ class Cerebria {
   }
 }
 
-module.exports = {
+export default {
   // Main class
   Cerebria,
   
@@ -149,8 +149,7 @@ module.exports = {
   HealthMonitor,
   MemoryManager,
   
-  // 持久化模块（如果可用）
-  ...(PersistentTaskManager && { PersistentTaskManager }),
+  // 持久化模块（如果可用�?  ...(PersistentTaskManager && { PersistentTaskManager }),
   ...(PersistentLogManager && { PersistentLogManager }),
   ...(PersistentPolicyManager && { PersistentPolicyManager }),
   ...(PersistentBackupManager && { PersistentBackupManager }),
@@ -175,7 +174,7 @@ module.exports = {
    * @param {string} [options.dataDir='./data'] - Data directory for persistence
    * @returns {Promise<Object>} Initialized system components
    */
-  async initialize(options = {}) {
+  async initialize(options: any = {}) {
     const config = options.mode || 'standard';
     return {
       taskManager: new TaskManager(options),
@@ -196,8 +195,8 @@ module.exports = {
    * @param {string} [options.memoryPath='./agent.limbic'] - LimbicDB file path
    * @returns {Promise<Object>} Initialized system components
    */
-  async initializeWithLimbicDB(options = {}) {
-    const { MemoryManager, createLimbicDBMemoryManager } = require('./../dist/memory/MemoryManager');
+  async initializeWithLimbicDB(options: any = {}) {
+    const { MemoryManager, createLimbicDBMemoryManager } = require('./memory/MemoryManager');
     
     const config = options.mode || 'standard';
     const memoryPath = options.memoryPath || './agent.limbic';
@@ -221,7 +220,7 @@ module.exports = {
    * @param {boolean} [options.persistent=true] - Enable persistence
    * @returns {Promise<Object>} Initialized system components
    */
-  async initializeWithPersistence(options = {}) {
+  async initializeWithPersistence(options: any = {}) {
     const config = options.mode || 'standard';
     const usePersistence = options.persistent !== false;
     
@@ -234,8 +233,7 @@ module.exports = {
     const components = {
       personalityManager: new PersonalityManager(options),
       logManager: new LogManager(options),
-      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆盖
-      scheduler: new IntelligentScheduler(options),
+      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options)
     };
     

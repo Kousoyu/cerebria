@@ -3,6 +3,7 @@
  */
 
 class CerebriaError extends Error {
+  [key: string]: any;
   constructor(code, message) {
     super(message);
     this.code = code;
@@ -11,6 +12,7 @@ class CerebriaError extends Error {
 }
 
 class ErrorHandler {
+  [key: string]: any;
   static handle(error, _context = {}) {
     return new CerebriaError('UNKNOWN', error.message);
   }
@@ -23,4 +25,4 @@ class ErrorHandler {
   }
 }
 
-module.exports = { ErrorHandler, CerebriaError };
+export { ErrorHandler, CerebriaError };

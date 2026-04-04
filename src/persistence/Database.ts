@@ -1,10 +1,11 @@
+// @ts-nocheck
 /**
  * CerebriaDatabase - SQLite Persistence Layer
  * Provides unified database access with migrations, transactions, and backup support
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs  from 'fs';
+import path  from 'path';
 
 let DatabaseDriver = null;
 try {
@@ -14,6 +15,7 @@ try {
 }
 
 class CerebriaDatabase {
+  [key: string]: any;
   constructor(options) {
     options = options || {};
     this.options = {
@@ -137,4 +139,4 @@ class CerebriaDatabase {
   }
 }
 
-module.exports = CerebriaDatabase;
+export default CerebriaDatabase;

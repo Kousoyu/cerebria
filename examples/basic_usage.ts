@@ -1,4 +1,4 @@
-﻿const Cerebria = require('../src/index.js');
+import Cerebria from '../src/index';
 
 async function main() {
   console.log('🚀 Cerebria v1.2.0 - Basic Usage');

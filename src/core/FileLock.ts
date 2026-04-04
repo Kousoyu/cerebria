@@ -3,6 +3,7 @@
  */
 
 class FileLock {
+  [key: string]: any;
   constructor(filePath) {
     this.filePath = filePath;
     this.locked = false;
@@ -26,4 +27,4 @@ class FileLock {
   }
 }
 
-module.exports = FileLock;
+export default FileLock;

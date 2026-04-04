@@ -3,7 +3,8 @@
  */
 
 class HealthMonitor {
-  constructor(options = {}) {
+  [key: string]: any;
+  constructor(options: any = {}) {
     this.dataDir = options.dataDir || './data';
     this.metrics = {
       memory: 0,
@@ -29,4 +30,4 @@ class HealthMonitor {
   }
 }
 
-module.exports = HealthMonitor;
+export default HealthMonitor;

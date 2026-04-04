@@ -1,4 +1,4 @@
-﻿const TaskManager = require('../../src/task_manager');
+﻿import TaskManager  from '../../src/task_manager';
 
 describe('TaskManager', () => {
   let taskManager;

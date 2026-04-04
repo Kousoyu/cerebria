@@ -1,14 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+import fs  from 'fs';
+import path  from 'path';
 
 class BackupManager {
+  [key: string]: any;
     constructor() {
         this.storage = new Map();
     }
 
-    async createBackup(options) {
+    async createBackup(options: any = {}) {
         const { name, type, metadata } = options;
-        const backupId = Date.now(); // use timestamp as an ID
+        const backupId = `bkp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const timestamp = new Date();
         const backup = { id: backupId, name, type, status: 'created', timestamp, size: 0, checksum: '', path: '', metadata };
         this.storage.set(backupId, backup);
@@ -16,7 +17,7 @@ class BackupManager {
         return backup;
     }
 
-    async listBackups(options) {
+    async listBackups(options: any = {}) {
         return Array.from(this.storage.values());
     }
 
@@ -24,7 +25,7 @@ class BackupManager {
         return this.storage.get(backupId);
     }
 
-    async restoreBackup(backupId, options) {
+    async restoreBackup(backupId, options: any = {}) {
         const backup = this.storage.get(backupId);
         if (!backup) throw new Error('Backup not found');
         // Logic to restore the backup
@@ -64,4 +65,4 @@ class BackupManager {
     }
 }
 
-module.exports = BackupManager;
+export default BackupManager;

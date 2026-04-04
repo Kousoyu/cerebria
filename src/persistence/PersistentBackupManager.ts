@@ -1,14 +1,16 @@
+// @ts-nocheck
 /**
  * PersistentBackupManager - SQLite-backed Backup Management
  * Extends in-memory BackupManager with persistent backup registry
  */
 
-const BackupManager = require('../backup_manager');
-const CerebriaDatabase = require('./Database');
-const fs = require('fs');
-const path = require('path');
+import BackupManager  from '../backup_manager';
+import CerebriaDatabase  from './Database';
+import fs  from 'fs';
+import path  from 'path';
 
 class PersistentBackupManager extends BackupManager {
+  [key: string]: any;
   constructor(options) {
     super(options);
     this.dbOptions = { dataDir: (options && options.dataDir) || './data', memory: (options && options.memory) || false };
@@ -66,4 +68,4 @@ class PersistentBackupManager extends BackupManager {
   async close() { if (this.db) { await this.db.disconnect(); this.db = null; } this.initialized = false; }
 }
 
-module.exports = PersistentBackupManager;
+export default PersistentBackupManager;

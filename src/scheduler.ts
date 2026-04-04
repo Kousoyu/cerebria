@@ -3,7 +3,8 @@
  */
 
 class IntelligentScheduler {
-  constructor(options = {}) {
+  [key: string]: any;
+  constructor(options: any = {}) {
     this.dataDir = options.dataDir || './data';
     this.tasks = [];
     this.isRunning = false;
@@ -29,4 +30,4 @@ class IntelligentScheduler {
   }
 }
 
-module.exports = IntelligentScheduler;
+export default IntelligentScheduler;

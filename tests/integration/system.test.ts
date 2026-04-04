@@ -1,4 +1,4 @@
-﻿const Cerebria = require('../../src/index');
+﻿import Cerebria  from '../../src/index';
 
 describe('Cerebria Integration', () => {
   let system;

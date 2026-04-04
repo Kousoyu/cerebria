@@ -1,9 +1,11 @@
+// @ts-nocheck
 ﻿/**
  * TaskManager - Dynamic Task Management System
  */
 
 class TaskManager {
-  constructor(options = {}) {
+  [key: string]: any;
+  constructor(options: any = {}) {
     this.dataDir = options.dataDir || './data';
     this.tasks = new Map();
     this.taskId = 0;
@@ -41,4 +43,4 @@ class TaskManager {
   }
 }
 
-module.exports = TaskManager;
+export default TaskManager;

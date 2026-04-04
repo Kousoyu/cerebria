@@ -3,6 +3,7 @@
  */
 
 class ConfigManager {
+  [key: string]: any;
   constructor(mode = 'standard') {
     this.mode = mode;
     this.config = this.loadConfig(mode);
@@ -26,4 +27,4 @@ class ConfigManager {
   }
 }
 
-module.exports = ConfigManager;
+export default ConfigManager;

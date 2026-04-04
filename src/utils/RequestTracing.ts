@@ -3,6 +3,7 @@
  */
 
 class RequestTracing {
+  [key: string]: any;
   static generateTraceId() {
     return `trace_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
@@ -30,4 +31,4 @@ class RequestTracing {
   }
 }
 
-module.exports = RequestTracing;
+export default RequestTracing;

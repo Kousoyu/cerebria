@@ -1,13 +1,15 @@
+// @ts-nocheck
 /**
  * PersistentTaskManager - 持久化任务管理
  * 继承自TaskManager，提供SQLite持久化支持
  */
 
-const TaskManager = require('../task_manager');
-const CerebriaDatabase = require('./Database');
+import TaskManager  from '../task_manager';
+import CerebriaDatabase  from './Database';
 
 class PersistentTaskManager extends TaskManager {
-  constructor(options = {}) {
+  [key: string]: any;
+  constructor(options: any = {}) {
     super(options);
 
     this.dbOptions = {
@@ -268,7 +270,7 @@ class PersistentTaskManager extends TaskManager {
   /**
    * 根据条件查询任务
    */
-  async queryTasks(filters = {}) {
+  async queryTasks(filters: any = {}) {
     if (!this.initialized) {
       await this.initialize();
     }
@@ -427,7 +429,7 @@ class PersistentTaskManager extends TaskManager {
   /**
    * 清理旧任务
    */
-  async cleanupOldTasks(options = {}) {
+  async cleanupOldTasks(options: any = {}) {
     if (!this.initialized) {
       await this.initialize();
     }
@@ -574,4 +576,4 @@ class PersistentTaskManager extends TaskManager {
   }
 }
 
-module.exports = PersistentTaskManager;
+export default PersistentTaskManager;

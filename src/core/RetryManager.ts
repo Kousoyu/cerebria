@@ -1,8 +1,10 @@
+// @ts-nocheck
 ﻿/**
  * RetryManager - Automatic Retry with Exponential Backoff
  */
 
 class RetryManager {
+  [key: string]: any;
   static async retry(fn, options = {}) {
     const maxRetries = options.maxRetries || 3;
     const delay = options.delay || 1000;
@@ -20,4 +22,4 @@ class RetryManager {
   }
 }
 
-module.exports = RetryManager;
+export default RetryManager;

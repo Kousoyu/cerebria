@@ -3,6 +3,7 @@
  */
 
 class Metrics {
+  [key: string]: any;
   constructor() {
     this.counters = new Map();
     this.timers = new Map();
@@ -27,4 +28,4 @@ class Metrics {
   }
 }
 
-module.exports = Metrics;
+export default Metrics;

@@ -3,6 +3,7 @@
  */
 
 class ValidationError extends Error {
+  [key: string]: any;
   constructor(message) {
     super(message);
     this.name = 'ValidationError';
@@ -10,24 +11,25 @@ class ValidationError extends Error {
 }
 
 class Validator {
-  static validateString(value, fieldName) {
+  [key: string]: any;
+  static validateString(value: any, fieldName: any) {
     if (typeof value !== 'string' || value.trim() === '') {
       throw new ValidationError(`${fieldName} must be a non-empty string`);
     }
   }
 
-  static validatePriority(value) {
+  static validatePriority(value: any) {
     const validPriorities = ['low', 'medium', 'high', 'critical'];
     if (!validPriorities.includes(value)) {
       throw new ValidationError(`Invalid priority: ${value}`);
     }
   }
 
-  static validateObject(value, fieldName) {
+  static validateObject(value: any, fieldName: any) {
     if (typeof value !== 'object' || value === null) {
       throw new ValidationError(`${fieldName} must be an object`);
     }
   }
 }
 
-module.exports = { Validator, ValidationError };
+export { Validator, ValidationError };

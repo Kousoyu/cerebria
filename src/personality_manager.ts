@@ -3,7 +3,8 @@
  */
 
 class PersonalityManager {
-  constructor(options = {}) {
+  [key: string]: any;
+  constructor(options: any = {}) {
     this.dataDir = options.dataDir || './data';
     this.personality = {
       traits: {},
@@ -37,4 +38,4 @@ class PersonalityManager {
   }
 }
 
-module.exports = PersonalityManager;
+export default PersonalityManager;

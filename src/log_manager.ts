@@ -3,7 +3,8 @@
  */
 
 class LogManager {
-  constructor(options = {}) {
+  [key: string]: any;
+  constructor(options: any = {}) {
     this.dataDir = options.dataDir || './data';
     this.logs = [];
     this.level = options.level || 'INFO';
@@ -19,7 +20,7 @@ class LogManager {
     console.log(`[${level}] ${message}`);
   }
 
-  async queryLogs(options = {}) {
+  async queryLogs(options: any = {}) {
     return this.logs.filter(log => 
       log.level === (options.level || log.level)
     );
@@ -30,4 +31,4 @@ class LogManager {
   }
 }
 
-module.exports = LogManager;
+export default LogManager;

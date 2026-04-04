@@ -3,9 +3,10 @@
  * Extends policy management with persistent storage
  */
 
-const CerebriaDatabase = require('./Database');
+import CerebriaDatabase  from './Database';
 
 class PersistentPolicyManager {
+  [key: string]: any;
   constructor(options) {
     this.dbOptions = { dataDir: (options && options.dataDir) || './data', memory: (options && options.memory) || false };
     this.db = null;
@@ -73,4 +74,4 @@ class PersistentPolicyManager {
   async close() { if (this.db) { await this.db.disconnect(); this.db = null; } this.initialized = false; }
 }
 
-module.exports = PersistentPolicyManager;
+export default PersistentPolicyManager;

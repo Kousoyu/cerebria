@@ -1,4 +1,4 @@
-﻿const BackupManager = require('../../src/backup_manager');
+import BackupManager  from '../../src/backup_manager';
 
 describe('BackupManager', () => {
   let backupManager;
@@ -8,8 +8,8 @@ describe('BackupManager', () => {
   });
 
   test('should create a backup', async () => {
-    const backupId = await backupManager.createBackup();
-    expect(backupId).toBeDefined();
+    const backup = await backupManager.createBackup();
+    expect(backup).toBeDefined();
   });
 
   test('should list backups', async () => {
@@ -20,13 +20,12 @@ describe('BackupManager', () => {
   });
 
   test('should restore a backup', async () => {
-    const backupId = await backupManager.createBackup();
-    const result = await backupManager.restoreBackup(backupId);
-    expect(result.success).toBe(true);
+    const backup = await backupManager.createBackup();
+    const result = await backupManager.restoreBackup(backup.id);
+    expect(result.status).toBe('restored');
   });
 
   test('should fail to restore non-existent backup', async () => {
-    const result = await backupManager.restoreBackup('non-existent');
-    expect(result.success).toBe(false);
+    await expect(backupManager.restoreBackup('non-existent')).rejects.toThrow('Backup not found');
   });
 });

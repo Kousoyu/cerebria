@@ -3,11 +3,12 @@
  * 继承自LogManager，提供SQLite持久化支持
  */
 
-const LogManager = require('../log_manager');
-const CogniDatabase = require('./Database');
+import LogManager  from '../log_manager';
+import CogniDatabase  from './Database';
 
 class PersistentLogManager extends LogManager {
-  constructor(options = {}) {
+  [key: string]: any;
+  constructor(options: any = {}) {
     super(options);
 
     this.dbOptions = {
@@ -123,7 +124,7 @@ class PersistentLogManager extends LogManager {
   /**
    * 查询日志（支持数据库查询）
    */
-  async queryLogs(options = {}) {
+  async queryLogs(options: any = {}) {
     // 如果禁用持久化或查询简单，使用内存查询
     if (!this.usePersistentStorage || (!options.startTime && !options.endTime && !options.limit)) {
       return super.queryLogs(options);
@@ -177,7 +178,7 @@ class PersistentLogManager extends LogManager {
   /**
    * 清理日志（同时清理数据库）
    */
-  async cleanup(options = {}) {
+  async cleanup(options: any = {}) {
     const { olderThan, keepLast } = options;
 
     // 调用父类清理内存日志
@@ -272,7 +273,7 @@ class PersistentLogManager extends LogManager {
   /**
    * 导出日志到文件
    */
-  async exportLogs(options = {}) {
+  async exportLogs(options: any = {}) {
     const { format = 'json', filePath } = options;
     
     try {
@@ -356,4 +357,4 @@ class PersistentLogManager extends LogManager {
   }
 }
 
-module.exports = PersistentLogManager;
+export default PersistentLogManager;

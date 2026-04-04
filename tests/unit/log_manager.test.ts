@@ -1,4 +1,4 @@
-﻿const LogManager = require('../../src/log_manager');
+﻿import LogManager  from '../../src/log_manager';
 
 describe('LogManager', () => {
   let logManager;
