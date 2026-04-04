@@ -4,7 +4,7 @@
  */
 
 const TaskManager = require('../task_manager');
-const CogniDatabase = require('./Database');
+const CerebriaDatabase = require('./Database');
 
 class PersistentTaskManager extends TaskManager {
   constructor(options = {}) {
@@ -34,7 +34,7 @@ class PersistentTaskManager extends TaskManager {
     }
 
     try {
-      this.db = new CogniDatabase(this.dbOptions);
+      this.db = new CerebriaDatabase(this.dbOptions);
       await this.db.connect();
       this.initialized = true;
 
