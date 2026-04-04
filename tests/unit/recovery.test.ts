@@ -52,9 +52,9 @@ describe('Crash Recovery Engine', () => {
     );
   });
 
-  it('should emit recovery events and trigger the scheduler', async () => {
+  it('should emit recovery events and trigger the scheduler, failing gracefully on empty mocks', async () => {
     const mockCallback = jest.fn();
-    EventBus.getInstance().on('task:resumed', mockCallback);
+    EventBus.getInstance().on('task:failed', mockCallback);
 
     // Simulate the system:recovery broadcast from index.ts
     EventBus.getInstance().emit('system:recovery', {
@@ -72,6 +72,6 @@ describe('Crash Recovery Engine', () => {
       }, 100);
     });
 
-    expect(mockCallback).toHaveBeenCalledWith(expect.objectContaining({ taskId: 'task_crashed_1' }));
+    expect(mockCallback).toHaveBeenCalledWith(expect.objectContaining({ taskId: 'task_crashed_1', error: 'Context Lost' }));
   });
 });

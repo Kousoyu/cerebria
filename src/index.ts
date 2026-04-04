@@ -199,6 +199,16 @@ export default {
       await components.backupManager.initialize();
     }
     
+    // Wire up Durable Execution MCP intent to WorkerPool
+    components.scheduler.workerPool.registerIntentHandler('mcp:execute', async (intent: any) => {
+      try {
+        const result = await components.mcpRegistry.executeTool(intent.tool, intent.args);
+        return result;
+      } catch (err: any) {
+        return { isError: true, content: [{ type: 'text', text: `Tool Intent execution failed: ${err.message}` }] };
+      }
+    });
+
     components.shutdown = async () => teardownSequence(components);
     attachProcessListeners(components, options);
     

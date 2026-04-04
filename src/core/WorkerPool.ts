@@ -16,6 +16,7 @@ export class WorkerPool {
   private activeWorkers: number;
   private isRunning: boolean;
   private pullQueueMethod?: () => Promise<any>;
+  private intentHandlers: Record<string, Function> = {};
 
   constructor(concurrency: number = 2) {
     this.concurrency = concurrency;
@@ -28,6 +29,13 @@ export class WorkerPool {
    */
   public bindQueuePop(method: () => Promise<any>) {
     this.pullQueueMethod = method;
+  }
+
+  /**
+   * Register a durable intent handler for crash-proof execution
+   */
+  public registerIntentHandler(action: string, handler: Function) {
+    this.intentHandlers[action] = handler;
   }
 
   public async start() {
@@ -90,22 +98,35 @@ export class WorkerPool {
     EventBus.getInstance().emit('task:started', { taskId: task.id, workerId });
 
     try {
-      if (typeof task.callback === 'function') {
-        const timeoutPromise = new Promise((_, reject) => {
-          const t = setTimeout(() => reject(new Error('Task execution timed out after 60s')), 60000);
-          if (t.unref) { t.unref(); }
-        });
+      const timeoutPromise = new Promise((_, reject) => {
+        const t = setTimeout(() => reject(new Error('Task execution timed out after 60s')), 60000);
+        if (t.unref) { t.unref(); }
+      });
 
-        const result = await Promise.race([
+      let result;
+      // 1. Prioritize durable intent execution (Crash-proof logic)
+      if (task.intent && this.intentHandlers[task.intent.action]) {
+        result = await Promise.race([
+          this.intentHandlers[task.intent.action](task.intent, context),
+          timeoutPromise
+        ]);
+        EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result });
+      } 
+      // 2. Fallback to generic passing callbacks (Ephemeral logic)
+      else if (typeof task.callback === 'function') {
+        // Legacy Ephemeral Callbacks
+        result = await Promise.race([
           task.callback(context),
           timeoutPromise
         ]);
-        
         EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result });
-      } else {
-        // Fallback for mock tasks
+      } 
+      // 3. Lost context recovery boundary
+      else {
+        // Task resumed from DB without an intent mapping and no callback
+        console.warn(`[WorkerPool] Task ${task.id} has no reliable callback or intent. Cannot reconstruct execution frame. Recovery halted.`);
         await this.sleep(500);
-        EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId });
+        EventBus.getInstance().emit('task:failed', { taskId: task.id, workerId, error: 'Context Lost' });
       }
     } catch (error: any) {
       console.error('[WorkerPool] Task execution failed:', error.message);

@@ -12,7 +12,10 @@
 
 <hr/>
 
-Cerebria is an advanced execution environment designed exclusively for autonomous AI agents. Unlike standard LangChain/AutoGen wrappers, Cerebria acts as a true Operating System Kernel for AI—providing memory paging, background parallel tasks, SQLite-backed crash recovery, and Model Context Protocol (MCP) isolation. 
+> [!WARNING]
+> **Engineering Status Update**: Cerebria is currently transitioning from an architectural prototype ("concept mock") into a reliable execution layer. Some persistence contracts, durable execution semantics, and true observability are WIP. We explicitly position this as an *experimental* runtime framework, not yet ready for unmonitored production usage.
+
+Cerebria is an advanced execution environment designed exclusively for autonomous AI agents. Unlike standard LangChain/AutoGen wrappers, Cerebria acts as an Operating System Kernel for AI—providing memory paging, background parallel tasks, SQLite-backed crash recovery, and Model Context Protocol (MCP) isolation. 
 
 Cerebria 是专为全自动 AI Agent 打造的进阶运行基座。区别于简单的 LLM 调用封装，Cerebria 的定位是 **AI 专属的操作系统内核**——它不仅提供内存分页管理，更具备并发任务调度池、断电崩溃恢复机制，以及原生的 MCP（模型上下文协议）工具沙箱。
 

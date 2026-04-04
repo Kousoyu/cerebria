@@ -2,7 +2,7 @@
 
 ## Supported Modes
 
-CogniCore supports three operational modes designed for different use cases:
+Cerebria supports three operational modes designed for different use cases:
 
 ### Light Mode
 - **Usage**: IoT devices, Raspberry Pi, minimal resource environments
@@ -29,12 +29,12 @@ CogniCore supports three operational modes designed for different use cases:
 
 ### From Source (Current Recommended Method)
 
-Since CogniCore is in active development and not yet published to npm, installation from source is recommended:
+Since Cerebria is in active development and not yet published to npm, installation from source is recommended:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Kousoyu/cogni-core.git
-cd cogni-core
+git clone https://github.com/Kousoyu/cerebria.git
+cd cerebria
 
 # Install dependencies
 npm install
@@ -45,10 +45,10 @@ npm test
 
 ### Planned Package Installation
 
-Once CogniCore reaches stable release status, installation via npm will be available:
+Once Cerebria reaches stable release status, installation via npm will be available:
 
 ```bash
-npm install cogni-core
+npm install cerebria
 ```
 
 *Note: Package publishing is planned for version 2.0.0 or later.*
@@ -58,15 +58,15 @@ npm install cogni-core
 ### Local Development
 
 ```javascript
-const CogniCore = require('./src/index.js');  // Note: path to source during development
+const Cerebria = require('./src/index.js');  // Note: path to source during development
 
 async function main() {
-  const system = await CogniCore.initialize({
+  const system = await Cerebria.initialize({
     mode: 'standard',
     dataDir: './data'
   });
   
-  console.log('CogniCore initialized successfully');
+  console.log('Cerebria initialized successfully');
   // Your code here
 }
 
@@ -84,21 +84,21 @@ docker run --rm -it \
   -e COGNI_MODE=standard \
   -v cogni-data:/app/data \
   -p 3000:3000 \
-  ghcr.io/kousoyu/cogni-core:latest
+  ghcr.io/kousoyu/cerebria:latest
 ```
 
 ## Configuration
 
 ### Environment Variables
 
-CogniCore can be configured via environment variables:
+Cerebria can be configured via environment variables:
 
 ```bash
 # Operational mode
 export COGNI_MODE=performance
 
 # Data directory (Docker: mount as volume)
-export COGNI_DATA_DIR=/var/lib/cogni-core
+export COGNI_DATA_DIR=/var/lib/cerebria
 
 # Logging level
 export COGNI_LOGGING_LEVEL=DEBUG
@@ -110,7 +110,7 @@ export COGNI_BACKUP_SCHEDULE="0 2 * * *"  # Daily at 2 AM
 ### Programmatic Configuration
 
 ```javascript
-const { ConfigManager } = require('cogni-core');
+const { ConfigManager } = require('cerebria');
 const config = new ConfigManager('performance');
 
 // Runtime configuration
@@ -127,9 +127,9 @@ config.set('maxRetries', 5);
 version: '3.8'
 
 services:
-  cogni-core:
-    image: ghcr.io/kousoyu/cogni-core:latest
-    container_name: cogni-core
+  cerebria:
+    image: ghcr.io/kousoyu/cerebria:latest
+    container_name: cerebria
     restart: unless-stopped
     environment:
       COGNI_MODE: performance
@@ -141,7 +141,7 @@ services:
     ports:
       - "3000:3000"
     healthcheck:
-      test: ["CMD", "node", "-e", "require('cogni-core').start()"]
+      test: ["CMD", "node", "-e", "require('cerebria').start()"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -153,24 +153,24 @@ volumes:
 ### Kubernetes Deployment
 
 ```yaml
-# cogni-core-deployment.yaml (example)
+# cerebria-deployment.yaml (example)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cogni-core
+  name: cerebria
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cogni-core
+      app: cerebria
   template:
     metadata:
       labels:
-        app: cogni-core
+        app: cerebria
     spec:
       containers:
-      - name: cogni-core
-        image: ghcr.io/kousoyu/cogni-core:latest
+      - name: cerebria
+        image: ghcr.io/kousoyu/cerebria:latest
         env:
         - name: COGNI_MODE
           value: "performance"
@@ -198,10 +198,10 @@ spec:
 
 ### Health Checks
 
-CogniCore provides built-in health monitoring:
+Cerebria provides built-in health monitoring:
 
 ```javascript
-const system = await CogniCore.initialize();
+const system = await Cerebria.initialize();
 const health = await system.healthMonitor.generateReport();
 
 if (health.healthy) {
@@ -246,15 +246,15 @@ if (result.success) {
 
 3. **Docker Volume Permissions**
    ```bash
-   docker run --rm -it -v $(pwd)/data:/app/data:z cogni-core
+   docker run --rm -it -v $(pwd)/data:/app/data:z cerebria
    ```
 
 ### Getting Help
 
 - Check the [API Reference](./API_REFERENCE.md) for detailed usage
 - Review [Configuration Guide](./CONFIGURATION.md) for setup options
-- File issues on [GitHub](https://github.com/Kousoyu/cogni-core/issues)
+- File issues on [GitHub](https://github.com/Kousoyu/cerebria/issues)
 
 ---
 
-*Note: CogniCore is currently in active development. Production deployment recommendations will evolve with the project.*
+*Note: Cerebria is currently in active development. Production deployment recommendations will evolve with the project.*

@@ -1,4 +1,4 @@
-# CogniCore 数据库架构设计
+# Cerebria 数据库架构设计
 
 ## 设计原则
 

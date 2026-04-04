@@ -17,7 +17,7 @@ class IntelligentScheduler {
   private recoveringTasks: any[];
   private executionQueue: any[];
   public isRunning: boolean;
-  private workerPool: WorkerPool;
+  public workerPool: WorkerPool;
 
   constructor(options: SchedulerOptions = {}) {
     this.dataDir = options.dataDir || './data';

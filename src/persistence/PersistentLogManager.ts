@@ -61,7 +61,7 @@ class PersistentLogManager extends LogManager {
     try {
       await this.ensureInitialized();
       
-      const logs = await this.db.getAll('logs');
+      const logs = this.db.query('SELECT * FROM logs');
       this.logs = logs.map((log: any) => ({
         ...log,
         data: log.data ? JSON.parse(log.data) : {}
@@ -108,7 +108,8 @@ class PersistentLogManager extends LogManager {
           created_at: Date.now()
         };
 
-        const id = await this.db.insert('logs', logEntry);
+        const r = this.db.run('INSERT INTO logs (timestamp, level, message, data) VALUES (?, ?, ?, ?)', [logEntry.timestamp, logEntry.level, logEntry.message, logEntry.data]);
+        const id = r.lastInsertRowid;
         
         // 更新缓存
         const fullLog = { id, ...logEntry, data };
@@ -163,7 +164,7 @@ class PersistentLogManager extends LogManager {
         params.push(options.limit);
       }
 
-      const logs = await this.db.query(query, params);
+      const logs = this.db.query(query, params);
       
       return logs.map((log: any) => ({
         ...log,
@@ -196,9 +197,9 @@ class PersistentLogManager extends LogManager {
           params.push(new Date(Date.now() - olderThan).toISOString());
         } else if (keepLast) {
           // 保留最新的 keepLast 条记录
-          const total = await this.db.count('logs');
+          const total = this.db.get('SELECT COUNT(*) as count FROM logs')?.count || 0;
           if (total > keepLast) {
-            const logsToDelete = await this.db.query(
+            const logsToDelete = this.db.query(
               'SELECT id FROM logs ORDER BY timestamp ASC LIMIT ?',
               [total - keepLast]
             );
@@ -212,7 +213,7 @@ class PersistentLogManager extends LogManager {
           }
         }
 
-        const result = await this.db.run(query, params);
+        const result = this.db.run(query, params);
         console.log(`✅ Cleaned up ${result.changes} logs from database`);
         
         // 重新加载缓存
@@ -245,9 +246,9 @@ class PersistentLogManager extends LogManager {
     try {
       await this.ensureInitialized();
 
-      const total = await this.db.count('logs');
+      const total = this.db.get('SELECT COUNT(*) as count FROM logs')?.count || 0;
       
-      const levelStats = await this.db.query(
+      const levelStats = this.db.query(
         'SELECT level, COUNT(*) as count FROM logs GROUP BY level'
       );
 
@@ -317,7 +318,7 @@ class PersistentLogManager extends LogManager {
    */
   async close() {
     if (this.db) {
-      await this.db.close();
+      await this.db.disconnect();
       this.db = null;
       this.initialized = false;
       console.log('✅ PersistentLogManager closed');
@@ -332,7 +333,7 @@ class PersistentLogManager extends LogManager {
       await this.ensureInitialized();
       
       if (this.usePersistentStorage) {
-        const count = await this.db.count('logs');
+        const count = this.db.get('SELECT COUNT(*) as count FROM logs')?.count || 0;
         return {
           healthy: true,
           storage: 'database',

@@ -42,7 +42,7 @@ class PersistentBackupManager extends BackupManager {
     }
     try {
       const rows = this.db.query('SELECT * FROM backups ORDER BY created_at DESC');
-      this.backups.clear();
+      this.storage.clear();
       this.backupCounter = 0;
       rows.forEach((row) => {
         if (row.id) {
@@ -51,7 +51,7 @@ class PersistentBackupManager extends BackupManager {
           if (num > this.backupCounter) {
             this.backupCounter = num;
           }
-          this.backups.set(row.id, { id: row.id, name: row.name, type: row.type, status: row.status, timestamp: row.created_at, size: row.size_bytes || 0, checksum: row.checksum_sha256, path: row.file_path, metadata: row.metadata ? JSON.parse(row.metadata) : {} });
+          this.storage.set(row.id, { id: row.id, name: row.name, type: row.type, status: row.status, timestamp: row.created_at, size: row.size_bytes || 0, checksum: row.checksum_sha256, path: row.file_path, metadata: row.metadata ? JSON.parse(row.metadata) : {} });
         }
       });
     } catch (error) {

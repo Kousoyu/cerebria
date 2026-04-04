@@ -94,16 +94,18 @@ class PersistentTaskManager extends TaskManager {
    * 转换数据库行到任务对象
    */
   dbRowToTask(row: any): TaskDefinition {
+    const md = row.metadata ? JSON.parse(row.metadata) : {};
     return {
       id: row.id,
       title: row.title,
       description: row.description,
       priority: row.priority,
       status: row.status,
+      intent: md.intent,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       completedAt: row.completed_at,
-      metadata: row.metadata ? JSON.parse(row.metadata) : {}
+      metadata: md
     };
   }
 
@@ -111,6 +113,7 @@ class PersistentTaskManager extends TaskManager {
    * 转换任务对象到数据库行
    */
   taskToDbRow(task: TaskDefinition): any {
+    const md = { ...(task.metadata || {}), intent: task.intent };
     return {
       id: task.id,
       title: task.title,
@@ -122,7 +125,7 @@ class PersistentTaskManager extends TaskManager {
       updated_at: task.updatedAt || new Date().toISOString(),
       completed_at: task.completedAt || null,
       /* eslint-enable camelcase */
-      metadata: task.metadata ? JSON.stringify(task.metadata) : null
+      metadata: JSON.stringify(md)
     };
   }
 

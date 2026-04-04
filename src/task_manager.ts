@@ -8,6 +8,7 @@ import EventBus from './core/EventBus';
 export interface TaskOptions {
   priority?: string;
   callback?: Function;
+  intent?: any;
   [key: string]: any; // Allow extensibility for custom metadata
 }
 
@@ -16,6 +17,7 @@ export interface TaskDefinition {
   title: string;
   description: string;
   priority: string;
+  intent?: any;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -38,6 +40,7 @@ class TaskManager {
       title,
       description,
       priority: options.priority || 'medium',
+      intent: options.intent || null,
       status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

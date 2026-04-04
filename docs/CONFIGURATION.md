@@ -10,11 +10,11 @@ Configuration files are in config/ directory:
 ## Environment Variables
 
 COGNI_MODE=performance
-COGNI_DATA_DIR=/var/lib/cogni-core
+COGNI_DATA_DIR=/var/lib/cerebria
 COGNI_LOGGING__LEVEL=DEBUG
 
 ## Runtime Configuration
 
-const ConfigManager = require('cogni-core').ConfigManager;
+const ConfigManager = require('cerebria').ConfigManager;
 const config = new ConfigManager('standard');
 config.set('maxBackups', 15);
