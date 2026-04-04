@@ -8,6 +8,7 @@
 [![Downloads](https://img.shields.io/npm/dm/cerebria.svg)](https://www.npmjs.com/package/cerebria)
 [![Tests](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
 
 Cerebria is a local-first runtime used to demonstrate how persistent agents can run with task state, recovery, and **debuggable memory powered by LimbicDB**.
 
@@ -94,8 +95,8 @@ docker run --rm -it \
 
 ## 📖 Basic Usage
 
-```javascript
-const Cerebria = require('cerebria');
+```typescript
+import Cerebria from 'cerebria';
 
 async function main() {
   // Initialize the system
@@ -129,8 +130,8 @@ main();
 **Option A: Mock Backend (Default)**
 Suitable for testing or short-lived sessions. No database files are created.
 
-```javascript
-const { Cerebria } = require('cerebria');
+```typescript
+import Cerebria from 'cerebria';
 
 async function main() {
   // Initializes with MockBackend by default
@@ -147,8 +148,8 @@ main();
 **Option B: LimbicDB Backend (Persistent)**
 Suitable for long-term memory persistence. Requires `limbicdb`.
 
-```javascript
-const { Cerebria } = require('cerebria');
+```typescript
+import Cerebria from 'cerebria';
 
 async function main() {
   // Initializes with LimbicDB (SQLite backed)
@@ -293,7 +294,7 @@ Cerebria is open source software licensed under the [MIT License](./LICENSE).
 - ✅ Core runtime architecture
 - ✅ Basic task and session state management  
 - ✅ Event-driven design
-- 🔄 SQLite persistence integration
+- ✅ SQLite persistence integration
 - 🔄 Policy governance framework
 
 ### Phase 2: Governance & Recovery

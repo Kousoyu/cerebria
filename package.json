@@ -2,18 +2,18 @@
   "name": "cerebria",
   "version": "1.2.0",
   "description": "A local-first, governed, recoverable agent runtime",
-  "main": "index.js",
+  "main": "dist/index.js",
   "exports": {
-    ".": "./index.js",
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "lint": "eslint src/**/*.js tests/**/*.js",
+    "lint": "eslint src/**/*.ts tests/**/*.ts",
     "build": "tsc",
-    "start": "node examples/basic_usage.js",
-    "dev": "node --watch examples/basic_usage.js",
+    "start": "ts-node examples/basic_usage.ts",
+    "dev": "ts-node-dev --respawn --transpile-only examples/basic_usage.ts",
     "docker:build": "docker build -t cerebria .",
     "docker:run": "docker run --rm -it -p 3000:3000 -v $(pwd)/data:/app/data cerebria",
     "install-deps": "npm install better-sqlite3"
@@ -41,8 +41,6 @@
     "node": ">=18.0.0"
   },
   "files": [
-    "index.js",
-    "src/",
     "dist/",
     "config/",
     "examples/",
@@ -59,6 +57,7 @@
     "limbicdb": "^1.0.1",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^6.0.2"
   },
   "optionalDependencies": {
