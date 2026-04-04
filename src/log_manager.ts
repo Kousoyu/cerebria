@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LogManager - Intelligent Multi-Level Logging System
  */
 
@@ -10,7 +10,7 @@ class LogManager {
     this.level = options.level || 'INFO';
   }
 
-  async writeLog(level, message, data = {}) {
+  async writeLog(level: string, message: string, data: any = {}) {
     this.logs.push({
       timestamp: new Date().toISOString(),
       level,
@@ -21,7 +21,7 @@ class LogManager {
   }
 
   async queryLogs(options: any = {}) {
-    return this.logs.filter(log => 
+    return this.logs.filter((log: any) => 
       log.level === (options.level || log.level)
     );
   }

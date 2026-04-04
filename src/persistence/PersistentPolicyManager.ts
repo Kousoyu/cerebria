@@ -7,7 +7,7 @@ import CerebriaDatabase  from './Database';
 
 class PersistentPolicyManager {
   [key: string]: any;
-  constructor(options) {
+  constructor(options: any = {}) {
     this.dbOptions = { dataDir: (options && options.dataDir) || './data', memory: (options && options.memory) || false };
     this.db = null;
     this.policies = new Map();
@@ -23,7 +23,7 @@ class PersistentPolicyManager {
       await this.loadPolicies();
       this.initialized = true;
       console.log('PersistentPolicyManager initialized');
-    } catch (error) {
+    } catch (error: any) {
       console.warn('Failed to initialize persistent policy storage:', error.message);
       this.usePersistence = false;
       this.initialized = true;
@@ -35,18 +35,18 @@ class PersistentPolicyManager {
     try {
       const rows = this.db.query('SELECT * FROM policies WHERE is_active = 1');
       this.policies.clear();
-      rows.forEach(row => {
+      rows.forEach((row: any) => {
         this.policies.set(row.id, { id: row.id, name: row.name, version: row.version, content: row.content, isActive: row.is_active === 1, createdAt: row.created_at, updatedAt: row.updated_at });
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load policies:', error.message);
     }
   }
 
-  async getPolicy(id) { return this.policies.get(id) || null; }
+  async getPolicy(id: string) { return this.policies.get(id) || null; }
   async getAllPolicies() { return Array.from(this.policies.values()); }
 
-  async createPolicy(policy) {
+  async createPolicy(policy: any) {
     const id = 'policy_' + Date.now();
     const p = { id, name: (policy && policy.name) || 'Unnamed Policy', version: 1, content: JSON.stringify((policy && policy.content) || {}), isActive: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     this.policies.set(id, p);
@@ -54,7 +54,7 @@ class PersistentPolicyManager {
     return p;
   }
 
-  async updatePolicy(id, updates) {
+  async updatePolicy(id: string, updates: any) {
     const p = this.policies.get(id);
     if (!p) return null;
     if (updates && updates.name) p.name = updates.name;
@@ -65,7 +65,7 @@ class PersistentPolicyManager {
     return p;
   }
 
-  async deletePolicy(id) {
+  async deletePolicy(id: string) {
     this.policies.delete(id);
     if (this.db) { try { this.db.run('UPDATE policies SET is_active=0 WHERE id=?', [id]); } catch (_) {} }
     return true;

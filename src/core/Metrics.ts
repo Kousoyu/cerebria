@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metrics - Performance Metrics Collection
  */
 
@@ -9,11 +9,11 @@ class Metrics {
     this.timers = new Map();
   }
 
-  increment(name, value = 1) {
+  increment(name: string, value: number = 1) {
     this.counters.set(name, (this.counters.get(name) || 0) + value);
   }
 
-  recordTime(name, duration) {
+  recordTime(name: string, duration: number) {
     if (!this.timers.has(name)) {
       this.timers.set(name, []);
     }

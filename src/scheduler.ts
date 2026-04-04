@@ -31,7 +31,7 @@ class IntelligentScheduler {
     console.log('⏹️ Scheduler stopped');
   }
 
-  async scheduleTask(cron, callback) {
+  async scheduleTask(cron: string, callback: Function) {
     this.tasks.push({
       cron,
       callback,

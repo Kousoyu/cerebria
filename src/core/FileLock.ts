@@ -1,10 +1,10 @@
-﻿/**
+/**
  * FileLock - Distributed File Locking System
  */
 
 class FileLock {
   [key: string]: any;
-  constructor(filePath) {
+  constructor(filePath: string) {
     this.filePath = filePath;
     this.locked = false;
   }
@@ -17,7 +17,7 @@ class FileLock {
     this.locked = false;
   }
 
-  async withLock(callback) {
+  async withLock(callback: Function) {
     await this.acquire();
     try {
       return await callback();

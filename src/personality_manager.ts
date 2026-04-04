@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PersonalityManager - User-Controlled Personality Evolution
  */
 
@@ -17,7 +17,7 @@ class PersonalityManager {
     return this.personality;
   }
 
-  async requestEvolution(reason) {
+  async requestEvolution(reason: string) {
     const requestId = `evolution_${Date.now()}`;
     this.personality.history.push({
       requestId,
@@ -28,8 +28,8 @@ class PersonalityManager {
     return requestId;
   }
 
-  async approveEvolution(requestId) {
-    const request = this.personality.history.find(r => r.requestId === requestId);
+  async approveEvolution(requestId: string) {
+    const request = this.personality.history.find((r: any) => r.requestId === requestId);
     if (request) {
       request.status = 'approved';
       request.approvedAt = new Date().toISOString();

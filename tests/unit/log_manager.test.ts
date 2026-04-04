@@ -1,7 +1,7 @@
-﻿import LogManager  from '../../src/log_manager';
+import LogManager  from '../../src/log_manager';
 
 describe('LogManager', () => {
-  let logManager;
+  let logManager: any;
 
   beforeEach(() => {
     logManager = new LogManager();

@@ -1,7 +1,7 @@
-﻿import Cerebria  from '../../src/index';
+import Cerebria  from '../../src/index';
 
 describe('Cerebria Integration', () => {
-  let system;
+  let system: any;
 
   beforeEach(async () => {
     system = await Cerebria.initialize({

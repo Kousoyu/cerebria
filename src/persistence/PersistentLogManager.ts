@@ -43,7 +43,7 @@ class PersistentLogManager extends LogManager {
       await this.loadLogsIntoCache();
 
       console.log('✅ PersistentLogManager initialized with database storage');
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️  Failed to initialize persistent storage, falling back to memory:', error.message);
       this.usePersistentStorage = false;
       this.initialized = true;
@@ -62,18 +62,18 @@ class PersistentLogManager extends LogManager {
       await this.ensureInitialized();
       
       const logs = await this.db.getAll('logs');
-      this.logs = logs.map(log => ({
+      this.logs = logs.map((log: any) => ({
         ...log,
         data: log.data ? JSON.parse(log.data) : {}
       }));
       
       // 构建缓存索引
-      this.logs.forEach(log => {
+      this.logs.forEach((log: any) => {
         this.cache.set(log.id, log);
       });
       
       console.log(`✅ Loaded ${this.logs.length} logs from database into cache`);
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️  Failed to load logs from database:', error.message);
       this.logs = [];
     }
@@ -91,7 +91,7 @@ class PersistentLogManager extends LogManager {
   /**
    * 写入日志（持久化到数据库）
    */
-  async writeLog(level, message, data = {}) {
+  async writeLog(level: string, message: string, data: any = {}) {
     // 调用父类方法写入内存
     await super.writeLog(level, message, data);
 
@@ -115,7 +115,7 @@ class PersistentLogManager extends LogManager {
         this.cache.set(id, fullLog);
         
         console.log(`✅ Log ${id} persisted to database`);
-      } catch (error) {
+      } catch (error: any) {
         console.warn('⚠️  Failed to persist log to database:', error.message);
       }
     }
@@ -165,11 +165,11 @@ class PersistentLogManager extends LogManager {
 
       const logs = await this.db.query(query, params);
       
-      return logs.map(log => ({
+      return logs.map((log: any) => ({
         ...log,
         data: log.data ? JSON.parse(log.data) : {}
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️  Failed to query logs from database:', error.message);
       return super.queryLogs(options);
     }
@@ -202,7 +202,7 @@ class PersistentLogManager extends LogManager {
               'SELECT id FROM logs ORDER BY timestamp ASC LIMIT ?',
               [total - keepLast]
             );
-            const ids = logsToDelete.map(log => log.id);
+            const ids = logsToDelete.map((log: any) => log.id);
             if (ids.length > 0) {
               query = 'DELETE FROM logs WHERE id IN (' + ids.map(() => '?').join(',') + ')';
               params.push(...ids);
@@ -219,7 +219,7 @@ class PersistentLogManager extends LogManager {
         await this.loadLogsIntoCache();
         
         return result.changes;
-      } catch (error) {
+      } catch (error: any) {
         console.warn('⚠️  Failed to cleanup logs from database:', error.message);
         return 0;
       }
@@ -235,7 +235,7 @@ class PersistentLogManager extends LogManager {
     if (!this.usePersistentStorage) {
       return {
         total: this.logs.length,
-        byLevel: this.logs.reduce((acc, log) => {
+        byLevel: this.logs.reduce((acc: any, log: any) => {
           acc[log.level] = (acc[log.level] || 0) + 1;
           return acc;
         }, {})
@@ -251,17 +251,17 @@ class PersistentLogManager extends LogManager {
         'SELECT level, COUNT(*) as count FROM logs GROUP BY level'
       );
 
-      const stats = {
+      const stats: { total: number, byLevel: Record<string, number> } = {
         total,
         byLevel: {}
       };
 
-      levelStats.forEach(stat => {
+      levelStats.forEach((stat: any) => {
         stats.byLevel[stat.level] = stat.count;
       });
 
       return stats;
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️  Failed to get log stats:', error.message);
       return {
         total: this.logs.length,
@@ -287,13 +287,13 @@ class PersistentLogManager extends LogManager {
       } else if (format === 'csv') {
         // 简单CSV转换
         const headers = ['timestamp', 'level', 'message', 'data'];
-        const rows = logs.map(log => [
+        const rows = logs.map((log: any) => [
           log.timestamp,
           log.level,
           `"${log.message.replace(/"/g, '""')}"`,
           JSON.stringify(log.data)
         ]);
-        content = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+        content = [headers.join(','), ...rows.map((row: any) => row.join(','))].join('\n');
       } else {
         throw new Error(`Unsupported format: ${format}`);
       }
@@ -306,7 +306,7 @@ class PersistentLogManager extends LogManager {
       }
 
       return content;
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️  Failed to export logs:', error.message);
       throw error;
     }
@@ -347,7 +347,7 @@ class PersistentLogManager extends LogManager {
           cacheSize: this.cache.size
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       return {
         healthy: false,
         error: error.message,

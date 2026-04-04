@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Validator - Parameter Validation System
  */
 
 class ValidationError extends Error {
   [key: string]: any;
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = 'ValidationError';
   }

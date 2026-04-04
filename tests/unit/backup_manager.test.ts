@@ -1,7 +1,7 @@
 import BackupManager  from '../../src/backup_manager';
 
 describe('BackupManager', () => {
-  let backupManager;
+  let backupManager: any;
 
   beforeEach(() => {
     backupManager = new BackupManager();

@@ -21,11 +21,11 @@ class BackupManager {
         return Array.from(this.storage.values());
     }
 
-    async getBackup(backupId) {
+    async getBackup(backupId: string) {
         return this.storage.get(backupId);
     }
 
-    async restoreBackup(backupId, options: any = {}) {
+    async restoreBackup(backupId: string, options: any = {}) {
         const backup = this.storage.get(backupId);
         if (!backup) throw new Error('Backup not found');
         // Logic to restore the backup
@@ -33,7 +33,7 @@ class BackupManager {
         return backup;
     }
 
-    async deleteBackup(backupId) {
+    async deleteBackup(backupId: string) {
         return this.storage.delete(backupId);
     }
 
@@ -52,7 +52,7 @@ class BackupManager {
         };
     }
 
-    async verifyBackup(backupId) {
+    async verifyBackup(backupId: string) {
         const backup = this.storage.get(backupId);
         if (!backup) throw new Error('Backup not found');
         // Verification logic can be added here

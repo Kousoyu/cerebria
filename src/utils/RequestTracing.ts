@@ -1,4 +1,4 @@
-﻿/**
+/**
  * RequestTracing - Request Chain Tracing
  */
 
@@ -8,7 +8,7 @@ class RequestTracing {
     return `trace_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  static createSpan(traceId, operationName) {
+  static createSpan(traceId: string, operationName: string) {
     return {
       traceId,
       spanId: `span_${Date.now()}`,
@@ -18,14 +18,14 @@ class RequestTracing {
     };
   }
 
-  static recordLog(span, message) {
+  static recordLog(span: any, message: string) {
     span.logs.push({
       timestamp: Date.now(),
       message
     });
   }
 
-  static finishSpan(span) {
+  static finishSpan(span: any) {
     span.duration = Date.now() - span.startTime;
     return span;
   }
