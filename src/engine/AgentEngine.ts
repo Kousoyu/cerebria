@@ -30,6 +30,7 @@ export class AgentEngine {
 
     while (true) {
       console.log(`[AgentEngine] 🧠 Thinking... (${messages.length} msgs in context)`);
+      EventBus.getInstance().emit('agent:thought', { action: 'thinking', messageCount: messages.length });
       const response = await this.llm.invoke(messages, availableTools);
       messages.push(response);
 
@@ -40,6 +41,7 @@ export class AgentEngine {
           const args = toolCall.function.arguments ? JSON.parse(toolCall.function.arguments) : {};
           
           console.log(`[AgentEngine] ⚙️ Dispatching Kernel Action: ${functionName}`, args);
+          EventBus.getInstance().emit('agent:tool_call', { tool: functionName, args });
           
           // Delegate the actual tool execution to the OS Worker Pool
           // By converting this into a Task Manager job, we get native timeout, retry, and durability specs.
@@ -69,6 +71,7 @@ export class AgentEngine {
       } else {
         // Final text payload reached
         console.log(`[AgentEngine] ✅ Final Synthesis Achieved.`);
+        EventBus.getInstance().emit('agent:thought', { action: 'synthesis', content: response.content });
         return response.content || '';
       }
     }

@@ -19,6 +19,7 @@ import FileLock from './core/FileLock';
 import RetryManager from './core/RetryManager';
 import { AgentEngine } from './engine/AgentEngine';
 import { LLMProvider, LLMConfig } from './engine/LLMProvider';
+import { DashboardServer } from './server/DashboardServer';
 const { ErrorHandler, CerebriaError } = require('./core/ErrorHandler');
 import Metrics from './core/Metrics';
 const { Validator, ValidationError } = require('./utils/Validator');
@@ -56,6 +57,10 @@ async function teardownSequence(system: any) {
   if (system.taskManager && system.taskManager.db) {
      system.taskManager.db.close();
      console.log('✅ [Cerebria OS] Persistent SQL storage flushed and safely closed');
+  }
+  
+  if (system.dashboardServer) {
+    system.dashboardServer.stop();
   }
   
   console.log('🛑 [Cerebria OS] Kernel Offline. Goodbye.');
@@ -120,6 +125,12 @@ export default {
       healthMonitor: new HealthMonitor(options),
       memoryManager: new MemoryManager(),
       mcpRegistry: new MCPRegistry()
+    };
+    
+    components.startDashboard = async (port: number = 3000) => {
+      const server = new DashboardServer(components, port);
+      await server.start();
+      components.dashboardServer = server;
     };
     
     components.shutdown = async () => teardownSequence(components);
@@ -214,6 +225,12 @@ export default {
     });
 
     components.shutdown = async () => teardownSequence(components);
+    components.startDashboard = async (port: number = 3000) => {
+      const server = new DashboardServer(components, port);
+      await server.start();
+      components.dashboardServer = server;
+    };
+
     attachProcessListeners(components, options);
     
     console.log('🚀 Cerebria Runtime Initialized (Persistent Enterprise Mode)');

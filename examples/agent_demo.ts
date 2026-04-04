@@ -15,6 +15,8 @@ async function runAgent() {
     concurrency: 2
   });
 
+  // Start the SSE Telemetry layer for the dashboard
+  await os.startDashboard(3000);
   await os.scheduler.start();
 
   // 2. Mount some OS-level capabilities (MCP Sandbox)
