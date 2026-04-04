@@ -1,6 +1,6 @@
 # Cerebria
 
-> ⚠️ **Experimental project.**  
+> ⚠️ **Experimental**  
 > Cerebria is the reference runtime for [LimbicDB](https://github.com/Kousoyu/limbicdb).  
 > **New here? Start with LimbicDB first.**
 
@@ -10,46 +10,30 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
 
-Cerebria is a local-first runtime used to demonstrate how persistent agents can run with task state, recovery, and **debuggable memory powered by LimbicDB**.
+Cerebria is an advanced, local-first runtime acting as the execution kernel beneath persistent AI agents. It provides industrial-grade task scheduling, state recovery, and memory governance powered by LimbicDB.
 
-## What Cerebria is
+---
 
-- A reference runtime for persistent local agents
-- A demo environment for integrating LimbicDB into an agent loop
-- An experimental runtime for task state, recovery, and governance ideas
+## 🎯 The Philosophy
 
-## What Cerebria is not
+**LimbicDB** is the memory. It remembers *what happened*.  
+**Cerebria** is the operating system. It governs *how things happen, and what happens when they fail*.
 
-- Not the main project to start with
-- Not a production-ready agent platform
-- Not a giant everything-framework
+If you need your agent to intelligently recall facts, use LimbicDB. If you need your agent to stubbornly survive power outages, execute governed multi-step reasoning, and properly flush state to disk—explore Cerebria.
 
-## Relationship to LimbicDB
+## ✨ Core Capabilities
 
-- **LimbicDB** focuses on memory: what was remembered, what was recalled, and where memories conflict
-- **Cerebria** focuses on runtime behavior: how an agent executes, persists, and recovers
-
-If you want debuggable AI memory, use **LimbicDB**.  
-If you want to see one way to consume it inside a local runtime, explore **Cerebria**.
-
-### Features
-
-* **Flexible Memory System**: Built-in `MemoryManager` with a pluggable backend architecture.
-  * **MockBackend**: Default, zero-dependency in-memory storage for development and testing.
-  * **LimbicDBBackend**: Optional, persistent storage powered by [limbicdb](https://github.com/Kousoyu/limbicdb) (SQLite-based).
-* **Task Management**: Robust task scheduling and state management.
-* **Governance & Recovery**: Built-in mechanisms for system stability.
-
-### What Cerebria Is Not
-- Just a prompt wrapper
-- Just a skill plugin pack  
-- Just a chatbot shell
-- A giant everything-framework
+- 🛡️ **Crash Recovery & State Restoration (New in 1.2!)**: Built-in "zombie-catching". If the system powers down unexpectedly, Cerebria natively intercepts all orphaned, active tasks upon the next boot sequence, marks their recovery footprint, and intelligently resumes execution.
+- 🔒 **100% Strict TypeScript**: Entirely refactored to pure TS ESM for rock-solid compilation without a single loose type error.
+- 💾 **Pluggable Architecture**:
+  - `MockBackend`: Zero-dependency in-memory mode for frictionless testing.
+  - `LimbicDBBackend`: Native SQLite persistent store.
+- ⚙️ **Event-Driven Task Control**: Deep architectural integration with an internal `EventBus` to handle complex asynchronous governance workflows.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18 or higher
+- Node.js 18+
 - npm or yarn
 
 ### Installation
@@ -58,263 +42,113 @@ If you want to see one way to consume it inside a local runtime, explore **Cereb
 npm install cerebria
 ```
 
-**Optional: Persistent Memory Support**
-If you want to use `LimbicDB` for persistent memory storage, you also need to install the peer dependency:
-
+**(Optional) Persistent Memory Support:**  
+To use SQLite-backed persistence, install the peer dependency:
 ```bash
 npm install limbicdb
 ```
 
-### Quick Start from Repository
-
-```bash
-# Clone the repository
-git clone https://github.com/Kousoyu/cerebria.git
-cd cerebria
-
-# Install dependencies
-npm install
-
-# Run the basic example
-npm start
-```
-
-### Docker Quick Start
-
-```bash
-# Build and run with Docker Compose
-docker-compose up --build
-
-# Or run directly
-docker run --rm -it \
-  -e COGNI_MODE=standard \
-  -v cogni-data:/app/data \
-  -p 3000:3000 \
-  ghcr.io/kousoyu/cerebria:latest
-```
-
-## 📖 Basic Usage
+### Basic Usage
 
 ```typescript
 import Cerebria from 'cerebria';
 
 async function main() {
-  // Initialize the system
-  const system = await Cerebria.initialize({
+  // Initialize the engine with Persistence and Auto-Recovery enabled
+  const system = await Cerebria.initializeWithPersistence({
     mode: 'standard',
     dataDir: './data'
   });
 
-  // Create a task
+  // Assign a task to the queue
   const taskId = await system.taskManager.createTask(
-    'Example Task',
-    'This is an example task',
+    'Data Aggregation',
+    'Fetch analytics and summarize.',
     { priority: 'high' }
   );
 
-  // Write a log
-  await system.logManager.writeLog('INFO', 'Task created', { taskId });
+  // Write a governed log
+  await system.logManager.writeLog('INFO', 'Pipeline initiated', { taskId });
 
-  // Get health report
+  // Monitor the Runtime Heartbeat
   const health = await system.healthMonitor.generateReport();
-  console.log('System health:', health);
+  console.log('Runtime Status:', health);
 }
 
-main();
+main().catch(console.error);
 ```
 
-## 💾 Memory Management
+## 🏗️ Architecture Stack
 
-`cerebria` provides a unified memory interface. You can choose your preferred backend.
-
-**Option A: Mock Backend (Default)**
-Suitable for testing or short-lived sessions. No database files are created.
-
-```typescript
-import Cerebria from 'cerebria';
-
-async function main() {
-  // Initializes with MockBackend by default
-  const system = await Cerebria.initialize(); 
-  
-  await system.memoryManager.remember('User prefers dark mode', 'preference');
-  const result = await system.memoryManager.recall('dark mode');
-  console.log(result.memories);
-}
-
-main();
-```
-
-**Option B: LimbicDB Backend (Persistent)**
-Suitable for long-term memory persistence. Requires `limbicdb`.
-
-```typescript
-import Cerebria from 'cerebria';
-
-async function main() {
-  // Initializes with LimbicDB (SQLite backed)
-  const system = await Cerebria.initializeWithLimbicDB({
-    memoryPath: './agent_memory.limbic' // Path to database file
-  });
-  
-  await system.memoryManager.remember('Project deadline is next Monday', 'fact');
-  
-  // ... existing logic
-}
-
-main();
-```
-
-## 🏗️ Architecture Overview
-
-```
+```text
 ┌─────────────────────────────────────────┐
 │           Application Layer             │
-│  (Personal Assistants, Coding Agents)  │
-└─────────────────────────────────────────┘
-                   │
-┌─────────────────────────────────────────┐
+│  (Personal Assistants, Coding Agents)   │
+└───────────────────┬─────────────────────┘
+                    │
+┌───────────────────┴─────────────────────┐
 │           Governance Layer              │
 │  (Policy Management, Approval Flows)    │
-└─────────────────────────────────────────┘
-                   │
-┌─────────────────────────────────────────┐
-│           Runtime Core                  │
-│  (Task, Skill, Session State, Execution)      │
-└─────────────────────────────────────────┘
-                   │
-┌─────────────────────────────────────────┐
+└───────────────────┬─────────────────────┘
+                    │
+┌───────────────────┴─────────────────────┐
+│           Cerebria Kernel               │
+│  (Tasks, Skills, EventBus, Execution)   │
+└───────────────────┬─────────────────────┘
+                    │
+┌───────────────────┴─────────────────────┐
 │           Persistence Layer             │
-│  (Runtime State, File System, Backups)         │
+│  (Crash Recovery, LimbicDB, Backups)    │
 └─────────────────────────────────────────┘
 ```
 
-### Key Components
-- **Task Manager** - Persistent task lifecycle management
-- **Policy Manager** - Governance and approval workflows  
-- **Log Manager** - Structured logging with query capabilities
-- **Backup Manager** - Reliable backup and recovery system
-- **Health Monitor** - Real-time system health metrics
-- **Event Bus** - Event-driven architecture for extensibility
+## ⚙️ Configuration Environments
 
-## ⚙️ Configuration
+Configure Cerebria dynamically using environments:
 
-Cerebria supports three operational modes:
-
-| Mode | Use Case | Memory | Cache Size | Max Backups |
+| Mode | Target | Mem Target | Cache Size | Max Backups |
 |------|----------|--------|------------|-------------|
-| **Light** | IoT, Raspberry Pi, minimal resources | ~20MB | 10 | 3 |
-| **Standard** | Personal development, small teams | ~50MB | 50 | 10 |
-| **Performance** | Enterprise, high concurrency | ~200MB | 200 | 20 |
+| **Light** | IoT, Raspberry Pi | ~20MB | 10 | 3 |
+| **Standard** | Developers, Small Teams| ~50MB | 50 | 10 |
+| **Performance**| Enterprise scale | ~200MB | 200 | 20 |
 
-Configure via environment variables:
 ```bash
-COGNI_MODE=performance
-COGNI_DATA_DIR=/var/lib/cerebria
-COGNI_LOGGING_LEVEL=DEBUG
+export COGNI_MODE=performance
+export COGNI_DATA_DIR=/var/lib/cerebria
+npm start
 ```
 
-Or programmatically:
-```javascript
-const { ConfigManager } = require('cerebria');
-const config = new ConfigManager('standard');
-```
+## 📚 Complete Documentation
 
-## 🔧 Development
-
-### Running Tests
-```bash
-npm test
-npm run test:coverage
-```
-
-### Code Quality
-```bash
-npm run lint
-```
-
-### Building for Production
-```bash
-npm run build
-```
-
-## 🐳 Docker Deployment
-
-Cerebria is optimized for containerized deployment:
-
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY . .
-RUN npm install --production
-ENV COGNI_MODE=standard
-VOLUME ["/app/data"]
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-See `docker-compose.yml` for complete orchestration example.
-
-## 📚 Documentation
-
-### MemoryManager API
-
-* `remember(content: string, type?: MemoryType): Promise<Memory>`
-  * Stores a new memory. `type` can be `'fact'`, `'episode'`, `'preference'`, `'procedure'`, or `'goal'`.
-* `recall(query: string, options?: RecallOptions): Promise<RecallResult>`
-  * Retrieves memories based on a query. Supports filtering by `types` and `limit`.
-* `forget(id: string): Promise<void>`
-  * Removes a specific memory by ID.
-
-### Full Documentation
-
-- [API Reference](./docs/API_REFERENCE.md) - Complete API documentation
-- [Configuration Guide](./docs/CONFIGURATION.md) - Configuration options
-- [Deployment Guide](./docs/DEPLOYMENT.md) - Production deployment
-- [Integration Guide](./docs/INTEGRATION.md) - External system integration
-- [Events Reference](./docs/EVENTS.md) - Event-driven architecture
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-Cerebria is open source software licensed under the [MIT License](./LICENSE).
+- [API Reference](./docs/API_REFERENCE.md)
+- [Configuration Guide](./docs/CONFIGURATION.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [Integration Details](./docs/INTEGRATION.md)
+- [Events Reference](./docs/EVENTS.md)
 
 ## 🗺️ Roadmap
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation (Completed)
 - ✅ Core runtime architecture
-- ✅ Basic task and session state management  
-- ✅ Event-driven design
+- ✅ Flexible task and session state management
+- ✅ Event-driven messaging bus
 - ✅ SQLite persistence integration
-- 🔄 Policy governance framework
 
-### Phase 2: Governance & Recovery
-- Policy management with approval workflows
-- Crash recovery and state restoration
-- MCP (Model Context Protocol) integration
-- OpenTelemetry observability
+### Phase 2: Resilience & Governance (Current)
+- ✅ Crash Recovery Engine & State Restoration **(Done!)**
+- 🔄 Policy management with human approval workflows
+- 🔄 MCP (Model Context Protocol) tool integration
+- 🔄 OpenTelemetry observability
 
-### Phase 3: Ecosystem & Scale
-- Multi-model agent support
-- Team collaboration features
-- Enterprise deployment patterns
-- Commercial control plane options
+### Phase 3: Ecosystem Pipeline
+- Multi-model agent dispatch support
+- Team collaboration namespaces
+- Commercial control plane abstractions
 
-## 🙏 Acknowledgments
-
-Cerebria builds upon ideas from the broader AI agent ecosystem, including inspiration from OpenClaw memory systems, LangGraph's durable execution patterns, and the MCP standardization effort.
+## 🤝 Contributing & License
+We welcome contributions! Read our [Contributing Guide](./CONTRIBUTING.md) for pull request workflows.
+Licensed under the [MIT License](./LICENSE).
 
 ---
 
-**Build the assistant later. Build the runtime first.**
-
-*Cerebria is the layer beneath the agent.*
+**Build the OS first. Build the agent later.**
