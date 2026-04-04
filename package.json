@@ -14,6 +14,7 @@
     "build": "tsc",
     "start": "ts-node examples/basic_usage.ts",
     "dev": "ts-node-dev --respawn --transpile-only examples/basic_usage.ts",
+    "dev:recovery": "ts-node examples/recovery_demo.ts",
     "docker:build": "docker build -t cerebria .",
     "docker:run": "docker run --rm -it -p 3000:3000 -v $(pwd)/data:/app/data cerebria",
     "install-deps": "npm install better-sqlite3"

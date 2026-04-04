@@ -31,17 +31,17 @@ let CogniDatabase: any = null;
 
 try {
   // eslint-disable-next-line global-require
-  PersistentTaskManager = require('./persistence/PersistentTaskManager');
+  PersistentTaskManager = require('./persistence/PersistentTaskManager').default || require('./persistence/PersistentTaskManager');
   // eslint-disable-next-line global-require
-  PersistentLogManager = require('./persistence/PersistentLogManager');
+  PersistentLogManager = require('./persistence/PersistentLogManager').default || require('./persistence/PersistentLogManager');
   // eslint-disable-next-line global-require
-  PersistentPolicyManager = require('./persistence/PersistentPolicyManager');
+  PersistentPolicyManager = require('./persistence/PersistentPolicyManager').default || require('./persistence/PersistentPolicyManager');
   // eslint-disable-next-line global-require
-  PersistentBackupManager = require('./persistence/PersistentBackupManager');
+  PersistentBackupManager = require('./persistence/PersistentBackupManager').default || require('./persistence/PersistentBackupManager');
   // eslint-disable-next-line global-require
-  CogniDatabase = require('./persistence/Database');
+  CogniDatabase = require('./persistence/Database').default || require('./persistence/Database');
 } catch (error) {
-  // 持久化模块可能不可用（缺少依赖或文件�?  console.warn('⚠️  Persistent modules not available:', error.message);
+  // 持久化模块可能不可用（缺少依赖或文件�?  console.warn('⚠️  Persistent modules not available:', error.message);
 }
 
 // Main Cerebria class
@@ -94,7 +94,7 @@ class Cerebria {
     const components = {
       personalityManager: new PersonalityManager(options),
       logManager: new LogManager(options),
-      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
+      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options)
     };
     
@@ -102,6 +102,14 @@ class Cerebria {
     if (usePersistence && PersistentTaskManager) {
       components.taskManager = new PersistentTaskManager(options);
       await components.taskManager.initialize();
+      try {
+        const { recovered, tasks } = await components.taskManager.recoverOrphanedTasks();
+        if (recovered > 0) {
+          EventBus.getInstance().emit('system:recovery', { orphanedTasks: tasks });
+        }
+      } catch (err: any) {
+        console.warn('⚠️  Failed to run recovery sequence:', err.message);
+      }
     } else {
       components.taskManager = new TaskManager(options);
     }
@@ -149,7 +157,7 @@ export default {
   HealthMonitor,
   MemoryManager,
   
-  // 持久化模块（如果可用�?  ...(PersistentTaskManager && { PersistentTaskManager }),
+  // 持久化模块（如果可用�?  ...(PersistentTaskManager && { PersistentTaskManager }),
   ...(PersistentLogManager && { PersistentLogManager }),
   ...(PersistentPolicyManager && { PersistentPolicyManager }),
   ...(PersistentBackupManager && { PersistentBackupManager }),
@@ -233,7 +241,7 @@ export default {
     const components = {
       personalityManager: new PersonalityManager(options),
       logManager: new LogManager(options),
-      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
+      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options)
     };
     
@@ -241,6 +249,14 @@ export default {
     if (usePersistence && PersistentTaskManager) {
       components.taskManager = new PersistentTaskManager(options);
       await components.taskManager.initialize();
+      try {
+        const { recovered, tasks } = await components.taskManager.recoverOrphanedTasks();
+        if (recovered > 0) {
+          EventBus.getInstance().emit('system:recovery', { orphanedTasks: tasks });
+        }
+      } catch (err: any) {
+        console.warn('⚠️  Failed to run recovery sequence:', err.message);
+      }
     } else {
       components.taskManager = new TaskManager(options);
     }

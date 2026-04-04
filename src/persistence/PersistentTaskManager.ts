@@ -563,6 +563,66 @@ class PersistentTaskManager extends TaskManager {
   }
 
   /**
+   * 恢复崩溃/僵尸任务 (Crash Recovery)
+   * 搜索上次运行中非正常关闭的 active 任务并将其标记为 recovering
+   */
+  async recoverOrphanedTasks() {
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
+    if (!this.usePersistentStorage || !this.db) {
+      return { recovered: 0, tasks: [] };
+    }
+
+    try {
+      // 查找所有 active 和 running 的任务（这些在重启时本应是死的）
+      const rows = this.db.query(`
+        SELECT * FROM tasks 
+        WHERE status IN ('active', 'running') AND completed_at IS NULL
+      `);
+      
+      const recoveredTasks = [];
+
+      if (rows.length > 0) {
+        this.db.transaction(() => {
+          rows.forEach((row) => {
+            const task = this.dbRowToTask(row);
+            task.status = 'recovering';
+            task.updatedAt = new Date().toISOString();
+            
+            // 写入恢复日志到 metadata 中
+            task.metadata = task.metadata || {};
+            task.metadata.recoveryCount = (task.metadata.recoveryCount || 0) + 1;
+            task.metadata.lastRecoveredAt = new Date().toISOString();
+            
+            const metadataStr = JSON.stringify(task.metadata);
+
+            this.db.run(`
+              UPDATE tasks 
+              SET status = 'recovering', updated_at = ?, metadata = ?
+              WHERE id = ?
+            `, [task.updatedAt, metadataStr, task.id]);
+
+            // 更新缓存
+            this.cache.set(task.id, task);
+            this.tasks.set(task.id, task);
+
+            recoveredTasks.push(task);
+          });
+        })();
+        
+        console.log(`🛡️ Recovery Engine: Intercepted and recovered ${rows.length} orphaned tasks.`);
+      }
+
+      return { recovered: recoveredTasks.length, tasks: recoveredTasks };
+    } catch (error) {
+      console.error('❌ Failed to recover orphaned tasks:', error.message);
+      return { recovered: 0, tasks: [] };
+    }
+  }
+
+  /**
    * 关闭数据库连接
    */
   async close() {
