@@ -133,6 +133,16 @@ export default {
       components.dashboardServer = server;
     };
     
+    // Wire up Durable Execution MCP intent to WorkerPool
+    components.scheduler.workerPool.registerIntentHandler('mcp:execute', async (intent: any) => {
+      try {
+        const result = await components.mcpRegistry.executeTool(intent.tool, intent.args);
+        return result;
+      } catch (err: any) {
+        return { isError: true, content: [{ type: 'text', text: `Tool Intent execution failed: ${err.message}` }] };
+      }
+    });
+    
     components.shutdown = async () => teardownSequence(components);
     attachProcessListeners(components, options);
     console.log('🚀 Cerebria Runtime Initialized (Memory Mode)');
@@ -157,6 +167,16 @@ export default {
       mcpRegistry: new MCPRegistry()
     };
     
+    // Wire up Durable Execution MCP intent to WorkerPool
+    components.scheduler.workerPool.registerIntentHandler('mcp:execute', async (intent: any) => {
+      try {
+        const result = await components.mcpRegistry.executeTool(intent.tool, intent.args);
+        return result;
+      } catch (err: any) {
+        return { isError: true, content: [{ type: 'text', text: `Tool Intent execution failed: ${err.message}` }] };
+      }
+    });
+
     components.shutdown = async () => teardownSequence(components);
     attachProcessListeners(components, options);
     console.log('🚀 Cerebria Runtime Initialized (LimbicDB Engine)');
