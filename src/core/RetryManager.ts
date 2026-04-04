@@ -1,5 +1,5 @@
 // @ts-nocheck
-﻿/**
+/**
  * RetryManager - Automatic Retry with Exponential Backoff
  */
 

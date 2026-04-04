@@ -98,7 +98,7 @@ describeIntegration('LimbicDBBackend Integration Tests', () => {
     // 确保所有写入都成功完成，没有数据库锁定错误
     const results = await Promise.all(promises);
     expect(results.length).toBe(10);
-    expect(results.every(r => r.id !== undefined)).toBe(true);
+    expect(results.every((r) => r.id !== undefined)).toBe(true);
 
     // 验证数据完整性
     const all = await backend.recall('Concurrent');

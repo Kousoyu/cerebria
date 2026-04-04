@@ -1,5 +1,5 @@
 // @ts-nocheck
-﻿/**
+/**
  * EventBus - Event-Driven Architecture
  */
 

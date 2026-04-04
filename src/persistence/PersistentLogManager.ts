@@ -204,7 +204,7 @@ class PersistentLogManager extends LogManager {
             );
             const ids = logsToDelete.map((log: any) => log.id);
             if (ids.length > 0) {
-              query = 'DELETE FROM logs WHERE id IN (' + ids.map(() => '?').join(',') + ')';
+              query = `DELETE FROM logs WHERE id IN (${ids.map(() => '?').join(',')})`;
               params.push(...ids);
             }
           } else {

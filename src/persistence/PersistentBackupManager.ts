@@ -20,7 +20,9 @@ class PersistentBackupManager extends BackupManager {
   }
 
   async initialize() {
-    if (this.initialized || !this.usePersistence) return;
+    if (this.initialized || !this.usePersistence) {
+      return;
+    }
     try {
       this.db = new CerebriaDatabase(this.dbOptions);
       await this.db.connect();
@@ -35,16 +37,20 @@ class PersistentBackupManager extends BackupManager {
   }
 
   async loadBackups() {
-    if (!this.db) return;
+    if (!this.db) {
+      return;
+    }
     try {
       const rows = this.db.query('SELECT * FROM backups ORDER BY created_at DESC');
       this.backups.clear();
       this.backupCounter = 0;
-      rows.forEach(row => {
+      rows.forEach((row) => {
         if (row.id) {
           const numPart = row.id.split('_').pop();
           const num = parseInt(numPart) || 0;
-          if (num > this.backupCounter) this.backupCounter = num;
+          if (num > this.backupCounter) {
+            this.backupCounter = num;
+          }
           this.backups.set(row.id, { id: row.id, name: row.name, type: row.type, status: row.status, timestamp: row.created_at, size: row.size_bytes || 0, checksum: row.checksum_sha256, path: row.file_path, metadata: row.metadata ? JSON.parse(row.metadata) : {} });
         }
       });
@@ -55,17 +61,31 @@ class PersistentBackupManager extends BackupManager {
 
   async createBackup(options) {
     const backup = await super.createBackup(options);
-    if (this.usePersistence && this.db) { try { this.db.run('INSERT INTO backups (id, name, type, status, size_bytes, checksum_sha256, file_path, metadata, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [backup.id, backup.name, backup.type, backup.status, backup.size || 0, backup.checksum, backup.path, JSON.stringify(backup.metadata || {}), backup.timestamp]); } catch (e) { console.error('Failed to persist backup record:', e.message); } }
+    if (this.usePersistence && this.db) {
+      try {
+        this.db.run('INSERT INTO backups (id, name, type, status, size_bytes, checksum_sha256, file_path, metadata, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [backup.id, backup.name, backup.type, backup.status, backup.size || 0, backup.checksum, backup.path, JSON.stringify(backup.metadata || {}), backup.timestamp]); 
+      } catch (e) {
+        console.error('Failed to persist backup record:', e.message); 
+      } 
+    }
     return backup;
   }
 
   async deleteBackup(backupId) {
     const result = await super.deleteBackup(backupId);
-    if (result && this.db) { try { this.db.run('DELETE FROM backups WHERE id = ?', [backupId]); } catch (_) {} }
+    if (result && this.db) {
+      try {
+        this.db.run('DELETE FROM backups WHERE id = ?', [backupId]); 
+      } catch (_) {} 
+    }
     return result;
   }
 
-  async close() { if (this.db) { await this.db.disconnect(); this.db = null; } this.initialized = false; }
+  async close() {
+    if (this.db) {
+      await this.db.disconnect(); this.db = null; 
+    } this.initialized = false; 
+  }
 }
 
 export default PersistentBackupManager;

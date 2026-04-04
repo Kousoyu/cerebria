@@ -59,7 +59,9 @@ class Cerebria {
       scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options),
       memoryManager,
-      get memory() { return memoryManager; }
+      get memory() {
+        return memoryManager; 
+      }
     };
   }
   
@@ -78,7 +80,9 @@ class Cerebria {
       scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options),
       memoryManager,
-      get memory() { return memoryManager; }
+      get memory() {
+        return memoryManager; 
+      }
     };
   }
   

@@ -20,14 +20,16 @@ describe('WorkerPool', () => {
     let pulled = false;
 
     workerPool.bindQueuePop(async () => {
-      if (pulled) return null;
+      if (pulled) {
+        return null;
+      }
       pulled = true;
       return {
         id: 'mock_task_1',
         title: 'Mock Task',
         callback: async () => {
-            executionCount++;
-            return true;
+          executionCount++;
+          return true;
         }
       };
     });
@@ -35,7 +37,7 @@ describe('WorkerPool', () => {
     await workerPool.start();
     
     // allow worker loop to trigger
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     
     expect(executionCount).toBe(1);
   });

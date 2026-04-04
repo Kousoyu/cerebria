@@ -31,7 +31,9 @@ export class WorkerPool {
   }
 
   public async start() {
-    if (this.isRunning) return;
+    if (this.isRunning) {
+      return;
+    }
     if (!this.pullQueueMethod) {
       throw new Error('Cannot start WorkerPool without a bindQueuePop method');
     }
@@ -41,13 +43,13 @@ export class WorkerPool {
     
     // Bootstrap workers
     for (let i = 0; i < this.concurrency; i++) {
-        this.spawnWorker(i);
+      this.spawnWorker(i);
     }
   }
 
   public stop() {
     this.isRunning = false;
-    console.log(`[WorkerPool] Stopped`);
+    console.log('[WorkerPool] Stopped');
   }
 
   private async spawnWorker(workerId: number) {
@@ -56,8 +58,8 @@ export class WorkerPool {
     while (this.isRunning) {
       try {
         if (this.activeWorkers >= this.concurrency) {
-            await this.sleep(1000);
-            continue;
+          await this.sleep(1000);
+          continue;
         }
 
         const task = await this.pullQueueMethod!();
@@ -97,12 +99,12 @@ export class WorkerPool {
         EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId });
       }
     } catch (error: any) {
-      console.error(`[WorkerPool] Task execution failed:`, error.message);
+      console.error('[WorkerPool] Task execution failed:', error.message);
       EventBus.getInstance().emit('task:failed', { taskId: task.id, error: error.message });
     }
   }
 
   private sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

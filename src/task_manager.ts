@@ -1,5 +1,5 @@
 // @ts-nocheck
-﻿/**
+/**
  * TaskManager - Dynamic Task Management System
  */
 

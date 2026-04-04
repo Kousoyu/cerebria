@@ -30,9 +30,13 @@ class CerebriaDatabase {
   }
 
   async connect() {
-    if (this.isConnected) return;
+    if (this.isConnected) {
+      return;
+    }
     const dbPath = this.options.memory ? ':memory:' : path.join(this.options.dataDir, 'cerebria.db');
-    if (!this.options.memory) fs.mkdirSync(this.options.dataDir, { recursive: true });
+    if (!this.options.memory) {
+      fs.mkdirSync(this.options.dataDir, { recursive: true });
+    }
     try {
       if (DatabaseDriver) {
         this.db = new DatabaseDriver(dbPath, { readonly: this.options.readonly, verbose: this.options.verbose ? console.log : undefined });
@@ -41,7 +45,7 @@ class CerebriaDatabase {
         this.db.pragma('synchronous = NORMAL');
         this.isConnected = true;
         await this.applyMigrations();
-        console.log('Database connected: ' + (this.options.memory ? 'in-memory' : dbPath));
+        console.log(`Database connected: ${this.options.memory ? 'in-memory' : dbPath}`);
       } else {
         console.warn('WARNING: Database running in in-memory fallback mode');
         this.db = { inMemoryFallback: true };
@@ -54,21 +58,27 @@ class CerebriaDatabase {
   }
 
   async disconnect() {
-    if (this.db && !this.db.inMemoryFallback) this.db.close();
+    if (this.db && !this.db.inMemoryFallback) {
+      this.db.close();
+    }
     this.db = null;
     this.isConnected = false;
   }
 
   async applyMigrations() {
-    if (this.migrationsApplied || this.db?.inMemoryFallback) return;
+    if (this.migrationsApplied || this.db?.inMemoryFallback) {
+      return;
+    }
     try {
       this.db.exec('CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
       const appliedVersions = new Set();
-      try { this.db.prepare('SELECT version FROM schema_migrations ORDER BY version').all().forEach(row => appliedVersions.add(row.version)); } catch (_) {}
+      try {
+        this.db.prepare('SELECT version FROM schema_migrations ORDER BY version').all().forEach((row) => appliedVersions.add(row.version)); 
+      } catch (_) {}
       const migrations = this.getMigrations();
       for (const migration of migrations) {
         if (!appliedVersions.has(migration.version)) {
-          console.log('Applying migration: ' + migration.name + ' (v' + migration.version + ')');
+          console.log(`Applying migration: ${migration.name} (v${migration.version})`);
           this.db.transaction(() => {
             this.db.exec(migration.sql);
             this.db.prepare('INSERT INTO schema_migrations (version, name) VALUES (?, ?)').run(migration.version, migration.name);
@@ -111,13 +121,43 @@ class CerebriaDatabase {
     ];
   }
 
-  query(sql, params) { if (this.db?.inMemoryFallback) return []; try { const stmt = this.db.prepare(sql); return (params && params.length) ? stmt.all(...params) : stmt.all(); } catch (e) { throw e; } }
-  run(sql, params) { if (this.db?.inMemoryFallback) return { lastInsertRowid: 0, changes: 0 }; try { const stmt = this.db.prepare(sql); return (params && params.length) ? stmt.run(...params) : stmt.run(); } catch (e) { throw e; } }
-  get(sql, params) { if (this.db?.inMemoryFallback) return null; try { const stmt = this.db.prepare(sql); return (params && params.length) ? stmt.get(...params) : stmt.get(); } catch (e) { throw e; } }
-  transaction(callback) { if (this.db?.inMemoryFallback) return () => callback(); return this.db.transaction(callback); }
+  query(sql, params) {
+    if (this.db?.inMemoryFallback) {
+      return [];
+    } try {
+      const stmt = this.db.prepare(sql); return (params && params.length) ? stmt.all(...params) : stmt.all(); 
+    } catch (e) {
+      throw e; 
+    } 
+  }
+  run(sql, params) {
+    if (this.db?.inMemoryFallback) {
+      return { lastInsertRowid: 0, changes: 0 };
+    } try {
+      const stmt = this.db.prepare(sql); return (params && params.length) ? stmt.run(...params) : stmt.run(); 
+    } catch (e) {
+      throw e; 
+    } 
+  }
+  get(sql, params) {
+    if (this.db?.inMemoryFallback) {
+      return null;
+    } try {
+      const stmt = this.db.prepare(sql); return (params && params.length) ? stmt.get(...params) : stmt.get(); 
+    } catch (e) {
+      throw e; 
+    } 
+  }
+  transaction(callback) {
+    if (this.db?.inMemoryFallback) {
+      return () => callback();
+    } return this.db.transaction(callback); 
+  }
 
   async backup(backupPath) {
-    if (this.db?.inMemoryFallback) return null;
+    if (this.db?.inMemoryFallback) {
+      return null;
+    }
     const backupDb = new DatabaseDriver(backupPath);
     this.db.backup(backupDb);
     backupDb.close();
@@ -125,17 +165,27 @@ class CerebriaDatabase {
   }
 
   getStats() {
-    if (this.db?.inMemoryFallback) return { tables: 0, size: 0, inMemory: true };
+    if (this.db?.inMemoryFallback) {
+      return { tables: 0, size: 0, inMemory: true };
+    }
     try {
       const tables = this.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
       const size = this.get('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()');
       return { tables: tables.length, size: size?.size || 0, inMemory: this.options.memory, path: path.join(this.options.dataDir, 'cerebria.db') };
-    } catch (e) { return { tables: 0, size: 0, error: e.message }; }
+    } catch (e) {
+      return { tables: 0, size: 0, error: e.message }; 
+    }
   }
 
   checkIntegrity() {
-    if (this.db?.inMemoryFallback) return { ok: true };
-    try { const r = this.query('PRAGMA integrity_check'); return { ok: r[0]?.integrity_check === 'ok', timestamp: new Date().toISOString() }; } catch (e) { return { ok: false, error: e.message }; }
+    if (this.db?.inMemoryFallback) {
+      return { ok: true };
+    }
+    try {
+      const r = this.query('PRAGMA integrity_check'); return { ok: r[0]?.integrity_check === 'ok', timestamp: new Date().toISOString() }; 
+    } catch (e) {
+      return { ok: false, error: e.message }; 
+    }
   }
 }
 

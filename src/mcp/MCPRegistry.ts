@@ -29,7 +29,7 @@ export class MCPRegistry {
    */
   public registerTool(tool: MCPTool): void {
     if (!tool.name || !tool.handler) {
-      throw new Error(`Invalid tool registration. Missing name or handler.`);
+      throw new Error('Invalid tool registration. Missing name or handler.');
     }
     this.tools.set(tool.name, tool);
     console.log(`[MCP] Tool [${tool.name}] mounted successfully`);
@@ -39,7 +39,7 @@ export class MCPRegistry {
    * Mount multiple tools
    */
   public registerTools(tools: MCPTool[]): void {
-    tools.forEach(t => this.registerTool(t));
+    tools.forEach((t) => this.registerTool(t));
   }
 
   /**
@@ -47,7 +47,7 @@ export class MCPRegistry {
    * Use this to format the prompt payload for LLMs
    */
   public getToolsSchema(): MCPToolSchema[] {
-    return Array.from(this.tools.values()).map(tool => ({
+    return Array.from(this.tools.values()).map((tool) => ({
       name: tool.name,
       description: tool.description,
       inputSchema: tool.inputSchema

@@ -54,7 +54,7 @@ class IntelligentScheduler {
   async scheduleTask(cron: string, callback: Function) {
     const taskDef = {
       id: `task_cron_${Date.now()}`,
-      title: `Cron Task`,
+      title: 'Cron Task',
       cron,
       callback,
       createdAt: new Date().toISOString()

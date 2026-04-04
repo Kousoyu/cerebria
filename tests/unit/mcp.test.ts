@@ -57,7 +57,9 @@ describe('MCP Registry', () => {
         name: 'thrower',
         description: 'Throws',
         inputSchema: { type: 'object', properties: {} },
-        handler: async () => { throw new Error('Boom'); }
+        handler: async () => {
+          throw new Error('Boom'); 
+        }
       });
 
       await expect(registry.executeTool('thrower', {})).rejects.toThrow('Boom');

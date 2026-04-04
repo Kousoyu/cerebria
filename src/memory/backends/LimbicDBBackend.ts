@@ -1,5 +1,5 @@
 // src/memory/backends/LimbicDBBackend.ts
-import { MemoryBackend, Memory, MemoryType, RecallOptions, RecallResult } from '../types'
+import { MemoryBackend, Memory, MemoryType, RecallOptions, RecallResult } from '../types';
 
 // Dynamically require limbicdb to handle peer dependency
 function loadLimbicDB() {
@@ -42,7 +42,7 @@ export class LimbicDBBackend implements MemoryBackend {
       preference: 'preference',
       procedure: 'procedure',
       goal: 'goal'
-    }
+    };
     
     // limbicdb's remember returns the actual memory object with real ID
     const limbicMemory = await this.db.remember(content, { kind: kindMap[type] });
@@ -75,7 +75,7 @@ export class LimbicDBBackend implements MemoryBackend {
         procedure: 'procedure',
         goal: 'goal'
       };
-      limbicOptions.kind = options.types.map(t => kindMap[t]);
+      limbicOptions.kind = options.types.map((t) => kindMap[t]);
     }
     
     // Call limbicdb recall
