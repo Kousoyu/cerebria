@@ -51,13 +51,17 @@ async function main() {
     console.log(`\n🧠 [LLM Agent Pipeline] Finished processing. Synthesis:`, payload);
   };
 
-  // 4. Dispatch the payload to the Scheduler Queue!
-  console.log('\n⏱️ Enqueuing heavy research task to Intelligent Scheduler...');
-  await system.scheduler.enqueueTask({
-    id: `research_01`,
-    title: 'Self-Research',
-    callback: executeResearchTask
-  });
+  // 4. Dispatch the payload via the unified TaskManager!
+  // This automatically persists state and seamlessly forwards to the WorkerPool
+  console.log('\n⏱️ Enqueuing heavy research task to TaskManager...');
+  await system.taskManager.createTask(
+    'Self-Research',
+    'Researching the runtime itself',
+    {
+      priority: 'high',
+      callback: executeResearchTask
+    }
+  );
 
   // Give the worker pool a chance to finish executing
   setTimeout(async () => {

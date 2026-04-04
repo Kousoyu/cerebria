@@ -91,8 +91,17 @@ export class WorkerPool {
 
     try {
       if (typeof task.callback === 'function') {
-        const result = await task.callback(context);
-        EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result }); // Using "resumed" to mock completion hooks for now
+        const timeoutPromise = new Promise((_, reject) => {
+          const t = setTimeout(() => reject(new Error('Task execution timed out after 60s')), 60000);
+          if (t.unref) { t.unref(); }
+        });
+
+        const result = await Promise.race([
+          task.callback(context),
+          timeoutPromise
+        ]);
+        
+        EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result });
       } else {
         // Fallback for mock tasks
         await this.sleep(500);

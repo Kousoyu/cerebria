@@ -3,6 +3,8 @@
  * TaskManager - Dynamic Task Management System
  */
 
+import EventBus from './core/EventBus';
+
 class TaskManager {
   [key: string]: any;
   constructor(options: any = {}) {
@@ -22,6 +24,13 @@ class TaskManager {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
+
+    // Notify scheduling execution
+    EventBus.getInstance().emit('task:created', {
+      ...this.tasks.get(taskId),
+      callback: options.callback
+    });
+
     return taskId;
   }
 

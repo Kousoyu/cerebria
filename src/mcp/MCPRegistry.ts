@@ -60,7 +60,8 @@ export class MCPRegistry {
   public async executeTool(name: string, args: any, context: any = {}): Promise<any> {
     const tool = this.tools.get(name);
     if (!tool) {
-      throw new Error(`Tool [${name}] not found in MCP Registry`);
+      console.warn(`[MCP] Tool [${name}] not found in Registry`);
+      return { isError: true, content: `Error: Tool [${name}] is not registered.` };
     }
 
     try {
@@ -70,7 +71,7 @@ export class MCPRegistry {
       return result;
     } catch (error: any) {
       console.warn(`[MCP] Tool execution failed for [${name}]:`, error.message);
-      throw error;
+      return { isError: true, content: `Error during tool execution: ${error.message}` };
     }
   }
 }

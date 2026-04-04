@@ -48,8 +48,10 @@ describe('MCP Registry', () => {
       expect(result).toBe(30);
     });
 
-    it('should throw an error for non-existent tools', async () => {
-      await expect(registry.executeTool('ghost', {})).rejects.toThrow('not found');
+    it('should return error object for non-existent tools', async () => {
+      const result = await registry.executeTool('ghost', {});
+      expect(result.isError).toBe(true);
+      expect(result.content).toContain('not registered');
     });
 
     it('should safely propagate handler errors', async () => {
@@ -62,7 +64,9 @@ describe('MCP Registry', () => {
         }
       });
 
-      await expect(registry.executeTool('thrower', {})).rejects.toThrow('Boom');
+      const result = await registry.executeTool('thrower', {});
+      expect(result.isError).toBe(true);
+      expect(result.content).toContain('Boom');
     });
   });
 });

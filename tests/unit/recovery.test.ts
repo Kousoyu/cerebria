@@ -61,8 +61,16 @@ describe('Crash Recovery Engine', () => {
       orphanedTasks: [{ id: 'task_crashed_1', title: 'Interrupted Task' }]
     });
 
-    // Wait for the worker pool loop to execute (polling is 1000ms, wait 1500ms)
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Wait for the worker pool loop to execute poll for the mockCallback to fire
+    await new Promise<void>((resolve) => {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        if (mockCallback.mock.calls.length > 0 || attempts++ > 20) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 100);
+    });
 
     expect(mockCallback).toHaveBeenCalledWith(expect.objectContaining({ taskId: 'task_crashed_1' }));
   });

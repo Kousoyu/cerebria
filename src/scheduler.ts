@@ -37,6 +37,11 @@ class IntelligentScheduler {
         data.orphanedTasks.forEach((task: any) => this.resumeTask(task));
       }
     });
+
+    // 监听任务创建事件，自动推入队列
+    EventBus.getInstance().on('task:created', (task: any) => {
+      this.enqueueTask(task);
+    });
   }
 
   async start() {
