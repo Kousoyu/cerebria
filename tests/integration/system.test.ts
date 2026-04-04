@@ -10,6 +10,12 @@ describe('Cerebria Integration', () => {
     });
   });
 
+  afterEach(async () => {
+    if (system && system.scheduler) {
+      system.scheduler.stop();
+    }
+  });
+
   test('should initialize system', () => {
     expect(system.taskManager).toBeDefined();
     expect(system.backupManager).toBeDefined();

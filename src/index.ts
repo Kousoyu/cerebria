@@ -11,6 +11,7 @@ import BackupManager  from './backup_manager';
 import IntelligentScheduler  from './scheduler';
 import HealthMonitor  from './health_monitor';
 import { MemoryManager  } from './memory/MemoryManager';
+import { MCPRegistry } from './mcp/MCPRegistry';
 
 // Core infrastructure modules
 import ConfigManager  from './core/ConfigManager';
@@ -41,7 +42,7 @@ try {
   // eslint-disable-next-line global-require
   CogniDatabase = require('./persistence/Database').default || require('./persistence/Database');
 } catch (error) {
-  // 持久化模块可能不可用（缺少依赖或文件�?  console.warn('⚠️  Persistent modules not available:', error.message);
+  // 持久化模块可能不可用（缺少依赖或文件�?  console.warn('⚠️  Persistent modules not available:', error.message);
 }
 
 // Main Cerebria class
@@ -94,7 +95,7 @@ class Cerebria {
     const components = {
       personalityManager: new PersonalityManager(options),
       logManager: new LogManager(options),
-      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
+      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options)
     };
     
@@ -157,7 +158,7 @@ export default {
   HealthMonitor,
   MemoryManager,
   
-  // 持久化模块（如果可用�?  ...(PersistentTaskManager && { PersistentTaskManager }),
+  // 持久化模块（如果可用�?  ...(PersistentTaskManager && { PersistentTaskManager }),
   ...(PersistentLogManager && { PersistentLogManager }),
   ...(PersistentPolicyManager && { PersistentPolicyManager }),
   ...(PersistentBackupManager && { PersistentBackupManager }),
@@ -191,7 +192,8 @@ export default {
       backupManager: new BackupManager(options),
       scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options),
-      memoryManager: new MemoryManager()
+      memoryManager: new MemoryManager(),
+      mcpRegistry: new MCPRegistry()
     };
   },
   
@@ -216,7 +218,8 @@ export default {
       backupManager: new BackupManager(options),
       scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options),
-      memoryManager: await createLimbicDBMemoryManager(memoryPath)
+      memoryManager: await createLimbicDBMemoryManager(memoryPath),
+      mcpRegistry: new MCPRegistry()
     };
   },
   
@@ -241,7 +244,7 @@ export default {
     const components = {
       personalityManager: new PersonalityManager(options),
       logManager: new LogManager(options),
-      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
+      backupManager: new BackupManager(options), // 默认内存版，下面可能被覆�?      scheduler: new IntelligentScheduler(options),
       healthMonitor: new HealthMonitor(options)
     };
     
