@@ -19,7 +19,9 @@ export class DashboardServer {
   }
 
   public async start() {
-    if (this.isRunning) return;
+    if (this.isRunning) {
+      return;
+    }
 
     this.server = http.createServer((req, res) => {
       // CORS configuration for local dashboard UI
@@ -57,7 +59,7 @@ export class DashboardServer {
       this.clients.forEach(client => client.end());
       this.clients.clear();
       this.isRunning = false;
-      console.log(`[Dashboard] 📡 Telemetry Server offline`);
+      console.log('[Dashboard] 📡 Telemetry Server offline');
     }
   }
 
@@ -80,7 +82,9 @@ export class DashboardServer {
    * Broadcast structured metrics down the SSE stream
    */
   private broadcast(eventName: string, payload: any) {
-    if (this.clients.size === 0) return;
+    if (this.clients.size === 0) {
+      return;
+    }
     
     const dataString = JSON.stringify({ event: eventName, data: payload });
     this.clients.forEach(client => {

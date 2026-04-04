@@ -1,6 +1,6 @@
 import Cerebria from '../src/index';
-// @ts-ignore
-import { AgentEngine } from '../src';
+
+const { AgentEngine } = Cerebria;
 
 /**
  * Run this example via:

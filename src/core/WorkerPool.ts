@@ -100,7 +100,9 @@ export class WorkerPool {
     try {
       const timeoutPromise = new Promise((_, reject) => {
         const t = setTimeout(() => reject(new Error('Task execution timed out after 60s')), 60000);
-        if (t.unref) { t.unref(); }
+        if (t.unref) {
+          t.unref(); 
+        }
       });
 
       let result;
@@ -111,18 +113,14 @@ export class WorkerPool {
           timeoutPromise
         ]);
         EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result });
-      } 
-      // 2. Fallback to generic passing callbacks (Ephemeral logic)
-      else if (typeof task.callback === 'function') {
+      } else if (typeof task.callback === 'function') {
         // Legacy Ephemeral Callbacks
         result = await Promise.race([
           task.callback(context),
           timeoutPromise
         ]);
         EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result });
-      } 
-      // 3. Lost context recovery boundary
-      else {
+      } else {
         // Task resumed from DB without an intent mapping and no callback
         console.warn(`[WorkerPool] Task ${task.id} has no reliable callback or intent. Cannot reconstruct execution frame. Recovery halted.`);
         await this.sleep(500);

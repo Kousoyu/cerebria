@@ -55,8 +55,8 @@ async function teardownSequence(system: any) {
   }
   
   if (system.taskManager && system.taskManager.db) {
-     system.taskManager.db.close();
-     console.log('✅ [Cerebria OS] Persistent SQL storage flushed and safely closed');
+    system.taskManager.db.close();
+    console.log('✅ [Cerebria OS] Persistent SQL storage flushed and safely closed');
   }
   
   if (system.dashboardServer) {

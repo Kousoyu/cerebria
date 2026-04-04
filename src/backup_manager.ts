@@ -19,7 +19,9 @@ class BackupManager {
     // Simulate real file operation if storage path is provided via options
     const bkpDir = path.join(process.cwd(), 'backups');
     try {
-      if (!fs.existsSync(bkpDir)) fs.mkdirSync(bkpDir, { recursive: true });
+      if (!fs.existsSync(bkpDir)) {
+        fs.mkdirSync(bkpDir, { recursive: true });
+      }
       bkpPath = path.join(bkpDir, `${backupId}.dump`);
       
       if (options.sourceDbPath && fs.existsSync(options.sourceDbPath)) {
@@ -67,7 +69,7 @@ class BackupManager {
     for (const [id, backup] of this.storage) {
       if (now - new Date(backup.timestamp).getTime() > threshold) {
         if (backup.path && fs.existsSync(backup.path)) {
-           fs.unlinkSync(backup.path);
+          fs.unlinkSync(backup.path);
         }
         this.storage.delete(id);
       }

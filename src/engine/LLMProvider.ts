@@ -37,7 +37,7 @@ export class LLMProvider {
     // Ensure backwards compatibility if base URL is passed without the path
     this.endpoint = this.config.baseURL!;
     if (!this.endpoint.endsWith('/chat/completions') && !this.endpoint.includes('localhost')) {
-      this.endpoint = this.endpoint.replace(/\/$/, '') + '/v1/chat/completions';
+      this.endpoint = `${this.endpoint.replace(/\/$/, '')}/v1/chat/completions`;
     }
   }
 
@@ -67,7 +67,7 @@ export class LLMProvider {
 
     if (tools && tools.length > 0) {
       payload.tools = this.formatTools(tools);
-      payload.tool_choice = "auto";
+      payload.tool_choice = 'auto';
     }
 
     try {
