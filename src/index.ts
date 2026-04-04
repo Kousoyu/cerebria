@@ -17,6 +17,8 @@ import ConfigManager from './core/ConfigManager';
 import EventBus from './core/EventBus';
 import FileLock from './core/FileLock';
 import RetryManager from './core/RetryManager';
+import { AgentEngine } from './engine/AgentEngine';
+import { LLMProvider, LLMConfig } from './engine/LLMProvider';
 const { ErrorHandler, CerebriaError } = require('./core/ErrorHandler');
 import Metrics from './core/Metrics';
 const { Validator, ValidationError } = require('./utils/Validator');
@@ -102,6 +104,8 @@ export default {
   Validator,
   ValidationError,
   RequestTracing,
+  AgentEngine,
+  LLMProvider,
   
   /**
    * Initialize the Cerebria system (memory-based mode)
