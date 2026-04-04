@@ -31,6 +31,15 @@ class TaskManager {
   constructor(options: any = {}) {
     this.dataDir = options.dataDir || './data';
     this.tasks = new Map();
+
+    // Listen for DurableContext step completions to patch history block by block in Memory Mode
+    EventBus.getInstance().on('workflow:step:completed', (data: any) => {
+      const task = this.tasks.get(data.taskId);
+      if (task) {
+        if (!task.workflowState) task.workflowState = { history: {}, status: 'running' };
+        task.workflowState.history[data.stepId] = data.result;
+      }
+    });
   }
 
   async createTask(title: string, description: string, options: TaskOptions = {}): Promise<string> {
@@ -41,6 +50,7 @@ class TaskManager {
       description,
       priority: options.priority || 'medium',
       intent: options.intent || null,
+      workflowState: { history: {}, status: 'running' },
       status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

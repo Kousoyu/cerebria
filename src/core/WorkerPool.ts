@@ -3,6 +3,7 @@
  */
 
 import EventBus from './EventBus';
+import { DurableContext, SuspendSignal } from './DurableContext';
 
 export interface TaskContext {
   taskId: string;
@@ -106,17 +107,19 @@ export class WorkerPool {
       });
 
       let result;
+      const durableCtx = new DurableContext(task.id, task.workflowState?.history || {});
+
       // 1. Prioritize durable intent execution (Crash-proof logic)
       if (task.intent && this.intentHandlers[task.intent.action]) {
         result = await Promise.race([
-          this.intentHandlers[task.intent.action](task.intent, context),
+          this.intentHandlers[task.intent.action](task.intent, durableCtx),
           timeoutPromise
         ]);
         EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result });
       } else if (typeof task.callback === 'function') {
         // Legacy Ephemeral Callbacks
         result = await Promise.race([
-          task.callback(context),
+          task.callback(durableCtx),
           timeoutPromise
         ]);
         EventBus.getInstance().emit('task:resumed', { taskId: task.id, workerId, result });
@@ -127,8 +130,17 @@ export class WorkerPool {
         EventBus.getInstance().emit('task:failed', { taskId: task.id, workerId, error: 'Context Lost' });
       }
     } catch (error: any) {
-      console.error('[WorkerPool] Task execution failed:', error.message);
-      EventBus.getInstance().emit('task:failed', { taskId: task.id, error: error.message });
+      if (error instanceof SuspendSignal) {
+        console.log(`[WorkerPool] 💤 Task ${task.id} gracefully suspended to sleep until ${new Date(error.resumeAt).toLocaleTimeString()}`);
+        EventBus.getInstance().emit('task:suspended', { 
+          taskId: task.id, 
+          workerId, 
+          resumeAt: error.resumeAt 
+        });
+      } else {
+        console.error('[WorkerPool] Task execution failed:', error.message);
+        EventBus.getInstance().emit('task:failed', { taskId: task.id, error: error.message });
+      }
     }
   }
 

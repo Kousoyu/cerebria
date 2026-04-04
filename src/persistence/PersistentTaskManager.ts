@@ -7,6 +7,7 @@
 
 import TaskManager, { TaskDefinition, TaskOptions }  from '../task_manager';
 import CerebriaDatabase  from './Database';
+import EventBus from '../core/EventBus';
 
 export interface PersistentOptions {
   dataDir?: string;
@@ -56,6 +57,11 @@ class PersistentTaskManager extends TaskManager {
 
       // 从数据库加载现有任务到缓存
       await this.loadTasksIntoCache();
+
+      // Listen for DurableContext step completions specifically to patch history block by block
+      EventBus.getInstance().on('workflow:step:completed', (data: any) => {
+        this.patchWorkflowHistory(data.taskId, data.stepId, data.result);
+      });
 
       console.log('✅ PersistentTaskManager initialized with database storage');
     } catch (error: any) {
@@ -113,7 +119,11 @@ class PersistentTaskManager extends TaskManager {
    * 转换任务对象到数据库行
    */
   taskToDbRow(task: TaskDefinition): any {
-    const md = { ...(task.metadata || {}), intent: task.intent };
+    const md = { 
+      ...(task.metadata || {}), 
+      intent: task.intent,
+      workflowState: task.workflowState || { history: {}, status: 'running' }
+    };
     return {
       id: task.id,
       title: task.title,
@@ -141,6 +151,9 @@ class PersistentTaskManager extends TaskManager {
     // 先调用父类方法创建内存任务
     const taskId = await super.createTask(title, description, options);
     const task = this.tasks.get(taskId);
+    
+    // 初始化空级工作流元数据
+    task.workflowState = task.workflowState || { history: {}, status: 'running' };
 
     // 如果启用持久化，保存到数据库
     if (this.usePersistentStorage && this.db) {
@@ -636,6 +649,30 @@ class PersistentTaskManager extends TaskManager {
     } catch (error: any) {
       console.error('❌ Failed to recover orphaned tasks:', error.message);
       return { recovered: 0, tasks: [] };
+    }
+  }
+
+  /**
+   * 增量更新 Task 的 Workflow State（用于 Event Sourcing）
+   */
+  public patchWorkflowHistory(taskId: string, stepId: string, result: any) {
+    if (!this.initialized || !this.usePersistentStorage || !this.db) {
+      return;
+    }
+    const task = this.getTask(taskId);
+    if (!task) return;
+
+    if (!task.workflowState) task.workflowState = { history: {}, status: 'running' };
+    task.workflowState.history[stepId] = result;
+
+    try {
+      const dbRow = this.taskToDbRow(task);
+      this.db.run(`
+        UPDATE tasks SET metadata = ?, updated_at = ?
+        WHERE id = ?
+      `, [dbRow.metadata, new Date().toISOString(), taskId]);
+    } catch (error: any) {
+      console.warn(`[TaskManager] 无法记录工作流存档点 ${stepId}:`, error.message);
     }
   }
 

@@ -52,6 +52,19 @@ class IntelligentScheduler {
     EventBus.getInstance().on('task:created', (task: any) => {
       this.enqueueTask(task);
     });
+
+    // 监听任务挂起休眠事件（Durable Execution）
+    EventBus.getInstance().on('task:suspended', (data: any) => {
+      console.log(`[Scheduler] Task ${data.taskId} suspended. Scheduling resumption at ${new Date(data.resumeAt).toLocaleTimeString()}`);
+      
+      const delay = Math.max(0, data.resumeAt - Date.now());
+      setTimeout(() => {
+        console.log(`[Scheduler] ⏰ Wake up call for Task ${data.taskId}. Re-enqueuing for Durable Replay.`);
+        // Assuming we can re-enqueue by its ID or fake task object
+        // The worker will fetch the real task context
+        this.enqueueTask({ id: data.taskId });
+      }, delay);
+    });
   }
 
   async start() {
