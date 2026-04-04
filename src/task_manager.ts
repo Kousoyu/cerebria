@@ -1,19 +1,37 @@
-// @ts-nocheck
+
 /**
  * TaskManager - Dynamic Task Management System
  */
 
 import EventBus from './core/EventBus';
 
-class TaskManager {
+export interface TaskOptions {
+  priority?: string;
+  callback?: Function;
+  [key: string]: any; // Allow extensibility for custom metadata
+}
+
+export interface TaskDefinition {
+  id: string;
+  title: string;
+  description: string;
+  priority: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
   [key: string]: any;
+}
+
+class TaskManager {
+  protected dataDir: string;
+  protected tasks: Map<string, TaskDefinition>;
+
   constructor(options: any = {}) {
     this.dataDir = options.dataDir || './data';
     this.tasks = new Map();
-    this.taskId = 0;
   }
 
-  async createTask(title, description, options = {}) {
+  async createTask(title: string, description: string, options: TaskOptions = {}): Promise<string> {
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.tasks.set(taskId, {
       id: taskId,
@@ -34,11 +52,11 @@ class TaskManager {
     return taskId;
   }
 
-  async getTask(taskId) {
+  async getTask(taskId: string): Promise<TaskDefinition | undefined> {
     return this.tasks.get(taskId);
   }
 
-  async completeTask(taskId) {
+  async completeTask(taskId: string): Promise<TaskDefinition | undefined> {
     const task = this.tasks.get(taskId);
     if (task) {
       task.status = 'completed';
@@ -47,7 +65,7 @@ class TaskManager {
     return task;
   }
 
-  async getAllTasks() {
+  async getAllTasks(): Promise<TaskDefinition[]> {
     return Array.from(this.tasks.values());
   }
 }

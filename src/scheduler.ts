@@ -5,11 +5,21 @@
 import EventBus from './core/EventBus';
 import { WorkerPool } from './core/WorkerPool';
 
-class IntelligentScheduler {
+export interface SchedulerOptions {
+  dataDir?: string;
+  concurrency?: number;
   [key: string]: any;
+}
+
+class IntelligentScheduler {
+  private dataDir: string;
+  private tasks: any[];
+  private recoveringTasks: any[];
+  private executionQueue: any[];
+  public isRunning: boolean;
   private workerPool: WorkerPool;
 
-  constructor(options: any = {}) {
+  constructor(options: SchedulerOptions = {}) {
     this.dataDir = options.dataDir || './data';
     this.tasks = [];
     this.recoveringTasks = [];

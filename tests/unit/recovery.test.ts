@@ -32,7 +32,7 @@ describe('Crash Recovery Engine', () => {
       ]),
       run: jest.fn(),
       transaction: (cb: any) => cb
-    };
+    } as any;
   });
 
   afterEach(() => {
@@ -46,7 +46,7 @@ describe('Crash Recovery Engine', () => {
     expect(recovered).toBe(1);
     expect(tasks[0].id).toBe('task_crashed_1');
     expect(tasks[0].status).toBe('recovering'); // Locked for recovery
-    expect(taskManager.db.run).toHaveBeenCalledWith(
+    expect(taskManager.db!.run).toHaveBeenCalledWith(
       expect.stringContaining('UPDATE tasks'),
       expect.any(Array)
     );

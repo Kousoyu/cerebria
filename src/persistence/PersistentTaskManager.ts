@@ -1,15 +1,29 @@
 // @ts-nocheck
+
 /**
  * PersistentTaskManager - 持久化任务管理
  * 继承自TaskManager，提供SQLite持久化支持
  */
 
-import TaskManager  from '../task_manager';
+import TaskManager, { TaskDefinition, TaskOptions }  from '../task_manager';
 import CerebriaDatabase  from './Database';
 
-class PersistentTaskManager extends TaskManager {
+export interface PersistentOptions {
+  dataDir?: string;
+  memory?: boolean;
+  verbose?: boolean;
+  persistent?: boolean;
   [key: string]: any;
-  constructor(options: any = {}) {
+}
+
+class PersistentTaskManager extends TaskManager {
+  private dbOptions: any;
+  public db: CerebriaDatabase | null;
+  public usePersistentStorage: boolean;
+  private cache: Map<string, TaskDefinition>;
+  public initialized: boolean;
+
+  constructor(options: PersistentOptions = {}) {
     super(options);
 
     this.dbOptions = {
@@ -44,7 +58,7 @@ class PersistentTaskManager extends TaskManager {
       await this.loadTasksIntoCache();
 
       console.log('✅ PersistentTaskManager initialized with database storage');
-    } catch (error) {
+    } catch (error: any) {
       console.warn('⚠️  Failed to initialize persistent storage, falling back to memory:', error.message);
       this.usePersistentStorage = false;
       this.initialized = true;
@@ -60,9 +74,9 @@ class PersistentTaskManager extends TaskManager {
     }
 
     try {
-      const tasks = this.db.query('SELECT * FROM tasks ORDER BY created_at DESC');
+      const tasks = this.db!.query('SELECT * FROM tasks ORDER BY created_at DESC');
 
-      tasks.forEach((task) => {
+      tasks.forEach((task: any) => {
         // 转换数据库行到任务对象
         const taskObj = this.dbRowToTask(task);
         this.cache.set(task.id, taskObj);
@@ -70,7 +84,7 @@ class PersistentTaskManager extends TaskManager {
       });
 
       console.log(`✅ Loaded ${tasks.length} tasks from database into cache`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Failed to load tasks from database:', error.message);
       throw error;
     }
@@ -79,7 +93,7 @@ class PersistentTaskManager extends TaskManager {
   /**
    * 转换数据库行到任务对象
    */
-  dbRowToTask(row) {
+  dbRowToTask(row: any): TaskDefinition {
     return {
       id: row.id,
       title: row.title,
@@ -96,7 +110,7 @@ class PersistentTaskManager extends TaskManager {
   /**
    * 转换任务对象到数据库行
    */
-  taskToDbRow(task) {
+  taskToDbRow(task: TaskDefinition): any {
     return {
       id: task.id,
       title: task.title,
@@ -115,7 +129,7 @@ class PersistentTaskManager extends TaskManager {
   /**
    * 创建任务（重写父类方法）
    */
-  async createTask(title, description, options = {}) {
+  async createTask(title: string, description: string, options: TaskOptions = {}): Promise<string> {
     // 确保初始化
     if (!this.initialized) {
       await this.initialize();
@@ -128,7 +142,7 @@ class PersistentTaskManager extends TaskManager {
     // 如果启用持久化，保存到数据库
     if (this.usePersistentStorage && this.db) {
       try {
-        const dbRow = this.taskToDbRow(task);
+        const dbRow = this.taskToDbRow(task!);
 
         this.db.run(`
           INSERT INTO tasks (id, title, description, priority, status, created_at, updated_at, metadata)
@@ -145,10 +159,10 @@ class PersistentTaskManager extends TaskManager {
         ]);
 
         // 更新缓存
-        this.cache.set(taskId, { ...task });
+        this.cache.set(taskId, { ...task! });
 
         console.log(`✅ Task ${taskId} persisted to database`);
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Failed to persist task to database:', error.message);
         // 不抛出错误，保持内存操作成功
       }
@@ -184,7 +198,7 @@ class PersistentTaskManager extends TaskManager {
 
           return task;
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Failed to fetch task from database:', error.message);
       }
     }
@@ -227,7 +241,7 @@ class PersistentTaskManager extends TaskManager {
         }
 
         console.log(`✅ Task ${taskId} completion persisted to database`);
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Failed to persist task completion to database:', error.message);
       }
     }
@@ -257,7 +271,7 @@ class PersistentTaskManager extends TaskManager {
         });
 
         return tasks;
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Failed to fetch tasks from database:', error.message);
         // 回退到内存存储
       }
@@ -287,7 +301,7 @@ class PersistentTaskManager extends TaskManager {
       const rows = this.db.query(sql, params);
 
       return rows.map((row) => this.dbRowToTask(row));
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Failed to query tasks:', error.message);
       throw error;
     }
@@ -409,7 +423,7 @@ class PersistentTaskManager extends TaskManager {
         storage: 'database',
         dbStats
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Failed to get task statistics:', error.message);
       throw error;
     }
@@ -486,7 +500,7 @@ class PersistentTaskManager extends TaskManager {
         storage: 'database',
         message: `Deleted ${result.changes} old completed tasks`
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Failed to cleanup old tasks:', error.message);
       throw error;
     }
@@ -556,7 +570,7 @@ class PersistentTaskManager extends TaskManager {
 
       console.log(`✅ Persisted ${persisted} tasks to database`);
       return { persisted };
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Failed to persist tasks:', error.message);
       throw error;
     }
@@ -616,7 +630,7 @@ class PersistentTaskManager extends TaskManager {
       }
 
       return { recovered: recoveredTasks.length, tasks: recoveredTasks };
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Failed to recover orphaned tasks:', error.message);
       return { recovered: 0, tasks: [] };
     }

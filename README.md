@@ -1,154 +1,107 @@
-# Cerebria
+<div align="center">
+  <h1>🧠 Cerebria AI Runtime OS</h1>
+  <p><strong>A Local-First, Governed, Recoverable Agent Runtime Kernel</strong></p>
+  <p><strong>全本地、强监管、带崩溃恢复的生产级大模型运行基座</strong></p>
 
-> ⚠️ **Experimental**  
-> Cerebria is the reference runtime for [LimbicDB](https://github.com/Kousoyu/limbicdb).  
-> **New here? Start with LimbicDB first.**
+  ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+  ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+  ![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
+  ![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
+  ![MCP Compliant](https://img.shields.io/badge/MCP-Compliant-brightgreen?style=for-the-badge)
+</div>
 
-[![npm version](https://img.shields.io/npm/v/cerebria.svg)](https://www.npmjs.com/package/cerebria)
-[![Downloads](https://img.shields.io/npm/dm/cerebria.svg)](https://www.npmjs.com/package/cerebria)
-[![Tests](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml/badge.svg)](https://github.com/Kousoyu/cerebria/actions/workflows/test.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
+<hr/>
 
-Cerebria is an advanced, local-first runtime acting as the execution kernel beneath persistent AI agents. It provides industrial-grade task scheduling, state recovery, and memory governance powered by LimbicDB.
+Cerebria is an advanced execution environment designed exclusively for autonomous AI agents. Unlike standard LangChain/AutoGen wrappers, Cerebria acts as a true Operating System Kernel for AI—providing memory paging, background parallel tasks, SQLite-backed crash recovery, and Model Context Protocol (MCP) isolation. 
 
----
+Cerebria 是专为全自动 AI Agent 打造的进阶运行基座。区别于简单的 LLM 调用封装，Cerebria 的定位是 **AI 专属的操作系统内核**——它不仅提供内存分页管理，更具备并发任务调度池、断电崩溃恢复机制，以及原生的 MCP（模型上下文协议）工具沙箱。
 
-## 🎯 The Philosophy
+## 🌟 Philosophy (设计哲学)
 
-**LimbicDB** is the memory. It remembers *what happened*.  
-**Cerebria** is the operating system. It governs *how things happen, and what happens when they fail*.
+1. **Agent as a Process (进程自治)**: Agents shouldn't hang when a single API call fails. Cerebria runs Agent tasks in a background memory pool.
+2. **Crash Resilience (断电恢复)**: Built-in `TaskManager` persists your agent's thought state to SQLite instantly. If the computer loses power, the agent wakes up right where it left off.
+3. **Graceful Teardown (优雅停机)**: Strict OS lifecycle hooks guarantee that pressing `Ctrl+C` flushes memories back to disk securely rather than corrupting active operations.
+4. **Governed Isolation (受控自治)**: By leveraging `MCPRegistry`, the runtime prevents hallucinations by treating unhandled logic failures as soft rejections, allowing the LLM to learn and heal.
 
-If you need your agent to intelligently recall facts, use LimbicDB. If you need your agent to stubbornly survive power outages, execute governed multi-step reasoning, and properly flush state to disk—explore Cerebria.
+## 🏗️ Architecture (内核架构)
 
-## ✨ Core Capabilities
+Cerebria operates exactly like an asynchronous computer OS. The system topology separates the Memory / Storage (TaskManager) from the CPU / Execution threads (IntelligentScheduler & WorkerPool) using an EventBus.
 
-- 🛡️ **Crash Recovery & State Restoration (New in 1.2!)**: Built-in "zombie-catching". If the system powers down unexpectedly, Cerebria natively intercepts all orphaned, active tasks upon the next boot sequence, marks their recovery footprint, and intelligently resumes execution.
-- 🔒 **100% Strict TypeScript**: Entirely refactored to pure TS ESM for rock-solid compilation without a single loose type error.
-- 💾 **Pluggable Architecture**:
-  - `MockBackend`: Zero-dependency in-memory mode for frictionless testing.
-  - `LimbicDBBackend`: Native SQLite persistent store.
-- ⚙️ **Event-Driven Task Control**: Deep architectural integration with an internal `EventBus` to handle complex asynchronous governance workflows.
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
-```bash
-npm install cerebria
+```mermaid
+graph TD
+    A[User / Application] -->|createTask| B(TaskManager)
+    B -->|DB Persist| SQLite[(SQLite Storage)]
+    B -->|EventBus task:created| C(IntelligentScheduler)
+    
+    C -->|Task Queue| WP[WorkerPool]
+    WP --> W1[Worker Thread 1]
+    WP --> W2[Worker Thread 2]
+    
+    W1 -.->|MCP executeTool| MCP[MCPRegistry]
+    W2 -.->|MCP executeTool| MCP[MCPRegistry]
+    
+    MCP -->|Sandboxed Return| W1
 ```
 
-**(Optional) Persistent Memory Support:**  
-To use SQLite-backed persistence, install the peer dependency:
-```bash
-npm install limbicdb
-```
+## 🚀 Quick Demo (极速演示)
 
-### Basic Usage
+Boot the OS Kernel and inject a background search task. Notice how `TaskManager` seamlessly routes it to the `WorkerPool`.
 
 ```typescript
 import Cerebria from 'cerebria';
 
 async function main() {
-  // Initialize the engine with Persistence and Auto-Recovery enabled
+  // 1. Boot the OS Kernel in persistent mode
   const system = await Cerebria.initializeWithPersistence({
-    mode: 'standard',
+    mode: 'performance',
     dataDir: './data'
   });
+  
+  // Power on the background scheduler
+  await system.scheduler.start();
 
-  // Assign a task to the queue
-  const taskId = await system.taskManager.createTask(
-    'Data Aggregation',
-    'Fetch analytics and summarize.',
-    { priority: 'high' }
+  // 2. Mount an MCP Compliant Tool
+  system.mcpRegistry.registerTool({
+    name: 'web_search',
+    description: 'Search the internet.',
+    inputSchema: {
+      type: 'object',
+      properties: { query: { type: 'string' } }
+    },
+    handler: async (args) => {
+      return `[Search Results: "${args.query}"]`;
+    }
+  });
+
+  // 3. Dispatch an Agent Thought Sequence
+  await system.taskManager.createTask(
+    'Self-Research',
+    'Researching the runtime itself',
+    {
+      priority: 'high',
+      callback: async (context) => {
+        console.log(`[Worker ${context.workerId}] Executing...`);
+        // Simulating LLM calling the MCP Tool securely
+        const result = await system.mcpRegistry.executeTool('web_search', { query: 'Cerebria AI' });
+        console.log(`[Synthesis] ${result}`);
+      }
+    }
   );
-
-  // Write a governed log
-  await system.logManager.writeLog('INFO', 'Pipeline initiated', { taskId });
-
-  // Monitor the Runtime Heartbeat
-  const health = await system.healthMonitor.generateReport();
-  console.log('Runtime Status:', health);
+  
+  // Press Ctrl+C at any time, and Cerebria will elegantly shutdown and save state.
 }
-
-main().catch(console.error);
 ```
 
-## 🏗️ Architecture Stack
-
-```text
-┌─────────────────────────────────────────┐
-│           Application Layer             │
-│  (Personal Assistants, Coding Agents)   │
-└───────────────────┬─────────────────────┘
-                    │
-┌───────────────────┴─────────────────────┐
-│           Governance Layer              │
-│  (Policy Management, Approval Flows)    │
-└───────────────────┬─────────────────────┘
-                    │
-┌───────────────────┴─────────────────────┐
-│           Cerebria Kernel               │
-│  (Tasks, Skills, EventBus, Execution)   │
-└───────────────────┬─────────────────────┘
-                    │
-┌───────────────────┴─────────────────────┐
-│           Persistence Layer             │
-│  (Crash Recovery, LimbicDB, Backups)    │
-└─────────────────────────────────────────┘
-```
-
-## ⚙️ Configuration Environments
-
-Configure Cerebria dynamically using environments:
-
-| Mode | Target | Mem Target | Cache Size | Max Backups |
-|------|----------|--------|------------|-------------|
-| **Light** | IoT, Raspberry Pi | ~20MB | 10 | 3 |
-| **Standard** | Developers, Small Teams| ~50MB | 50 | 10 |
-| **Performance**| Enterprise scale | ~200MB | 200 | 20 |
+## 📦 Installation (安装)
 
 ```bash
-export COGNI_MODE=performance
-export COGNI_DATA_DIR=/var/lib/cerebria
-npm start
+npm install cerebria
 ```
 
-## 📚 Complete Documentation
+Requirements:
+- `Node.js >= 18.0.0`
+- TypeScript support enabled (`tsc`)
 
-- [API Reference](./docs/API_REFERENCE.md)
-- [Configuration Guide](./docs/CONFIGURATION.md)
-- [Deployment Guide](./docs/DEPLOYMENT.md)
-- [Integration Details](./docs/INTEGRATION.md)
-- [Events Reference](./docs/EVENTS.md)
+## 🛡️ License
 
-## 🗺️ Roadmap
-
-### Phase 1: Foundation (Completed)
-- ✅ Core runtime architecture
-- ✅ Flexible task and session state management
-- ✅ Event-driven messaging bus
-- ✅ SQLite persistence integration
-
-### Phase 2: Resilience & Governance (Current)
-- ✅ Crash Recovery Engine & State Restoration **(Done!)**
-- 🔄 Policy management with human approval workflows
-- 🔄 MCP (Model Context Protocol) tool integration
-- 🔄 OpenTelemetry observability
-
-### Phase 3: Ecosystem Pipeline
-- Multi-model agent dispatch support
-- Team collaboration namespaces
-- Commercial control plane abstractions
-
-## 🤝 Contributing & License
-We welcome contributions! Read our [Contributing Guide](./CONTRIBUTING.md) for pull request workflows.
-Licensed under the [MIT License](./LICENSE).
-
----
-
-**Build the OS first. Build the agent later.**
+MIT License. Built for the next era of Autonomous Intelligence.
