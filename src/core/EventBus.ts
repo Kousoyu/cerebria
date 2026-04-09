@@ -1,30 +1,33 @@
-// @ts-nocheck
 /**
  * EventBus - Event-Driven Architecture
  */
 
+type EventHandler = (data: any) => void;
+
 class EventBus {
-  [key: string]: any;
+  private events: Map<string, EventHandler[]>;
+  private static instance: EventBus;
+
   constructor() {
     this.events = new Map();
   }
 
-  on(eventName, handler) {
+  on(eventName: string, handler: EventHandler): void {
     if (!this.events.has(eventName)) {
       this.events.set(eventName, []);
     }
-    this.events.get(eventName).push(handler);
+    this.events.get(eventName)!.push(handler);
   }
 
-  emit(eventName, data) {
+  emit(eventName: string, data: any): void {
     if (this.events.has(eventName)) {
-      this.events.get(eventName).forEach((handler) => handler(data));
+      this.events.get(eventName)!.forEach((handler) => handler(data));
     }
   }
 
-  off(eventName, handler) {
+  off(eventName: string, handler: EventHandler): void {
     if (this.events.has(eventName)) {
-      const handlers = this.events.get(eventName);
+      const handlers = this.events.get(eventName)!;
       const index = handlers.indexOf(handler);
       if (index > -1) {
         handlers.splice(index, 1);
@@ -32,7 +35,7 @@ class EventBus {
     }
   }
 
-  static getInstance() {
+  static getInstance(): EventBus {
     if (!EventBus.instance) {
       EventBus.instance = new EventBus();
     }
