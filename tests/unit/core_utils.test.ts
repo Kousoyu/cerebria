@@ -82,13 +82,15 @@ describe('FileLock', () => {
     const lock1 = new FileLock(lockBase);
     await lock1.acquire();
 
-    // Release after 80ms — lock2 should eventually succeed
-    setTimeout(() => lock1.release(), 80);
+    // Schedule release after 80ms — well within lock2's retry window
+    // (maxRetries=10 × retryDelayMs=20 gives up to ~10s of attempts).
+    const releaseTimer = setTimeout(() => lock1.release(), 80);
 
     const lock2 = new FileLock(lockBase, { maxRetries: 10, retryDelayMs: 20 });
     await expect(lock2.acquire()).resolves.toBeUndefined();
+    clearTimeout(releaseTimer);
     await lock2.release();
-  });
+  }, 5000); // explicit 5s timeout so slow CI boxes still have headroom
 });
 
 // ─── RetryManager ────────────────────────────────────────────────────────────

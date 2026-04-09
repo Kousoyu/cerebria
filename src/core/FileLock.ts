@@ -8,10 +8,10 @@
 import fs from 'fs';
 
 class FileLock {
-  [key: string]: any;
   private readonly lockPath: string;
   private readonly maxRetries: number;
   private readonly retryDelayMs: number;
+  public locked: boolean;
 
   constructor(filePath: string, options: { maxRetries?: number; retryDelayMs?: number } = {}) {
     this.lockPath = `${filePath}.lock`;

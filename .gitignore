@@ -45,6 +45,9 @@ temp/
 *.bak
 *.backup
 
+# BackupManager test output (*.dump files generated during test runs)
+backups/
+
 # Build artifacts
 dist/
 build/
