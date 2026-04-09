@@ -60,7 +60,7 @@ class PersistentTaskManager extends TaskManager {
 
       // Listen for DurableContext step completions specifically to patch history block by block
       EventBus.getInstance().on('workflow:step:completed', (data: any) => {
-        this.patchWorkflowHistory(data.taskId, data.stepId, data.result);
+        void this.patchWorkflowHistory(data.taskId, data.stepId, data.result);
       });
 
       console.log('✅ PersistentTaskManager initialized with database storage');
@@ -411,30 +411,33 @@ class PersistentTaskManager extends TaskManager {
     }
 
     try {
-      const stats = this.db.query(`
+      const totals = this.db.get(`
         SELECT 
           COUNT(*) as total,
           COUNT(CASE WHEN status = 'active' THEN 1 END) as active,
-          COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
-          priority,
-          COUNT(*) as priority_count
+          COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed
+        FROM tasks
+      `);
+
+      const priorityRows = this.db.query(`
+        SELECT priority, COUNT(*) as priority_count
         FROM tasks
         GROUP BY priority
       `);
 
       const dbStats = this.db.getStats();
 
-      const byPriority = {};
-      stats.forEach((row) => {
+      const byPriority: Record<string, number> = {};
+      priorityRows.forEach((row: any) => {
         if (row.priority) {
           byPriority[row.priority] = row.priority_count;
         }
       });
 
       return {
-        total: stats[0]?.total || 0,
-        active: stats[0]?.active || 0,
-        completed: stats[0]?.completed || 0,
+        total: totals?.total || 0,
+        active: totals?.active || 0,
+        completed: totals?.completed || 0,
         byPriority,
         storage: 'database',
         dbStats
@@ -655,14 +658,18 @@ class PersistentTaskManager extends TaskManager {
   /**
    * 增量更新 Task 的 Workflow State（用于 Event Sourcing）
    */
-  public patchWorkflowHistory(taskId: string, stepId: string, result: any) {
+  public async patchWorkflowHistory(taskId: string, stepId: string, result: any): Promise<void> {
     if (!this.initialized || !this.usePersistentStorage || !this.db) {
       return;
     }
-    const task = this.getTask(taskId);
-    if (!task) return;
+    const task = await this.getTask(taskId);
+    if (!task) {
+      return;
+    }
 
-    if (!task.workflowState) task.workflowState = { history: {}, status: 'running' };
+    if (!task.workflowState) {
+      task.workflowState = { history: {}, status: 'running' };
+    }
     task.workflowState.history[stepId] = result;
 
     try {

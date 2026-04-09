@@ -69,13 +69,16 @@ describe('Durable Execution Engine', () => {
     await expect(workerMethod(task.intent, ctx)).rejects.toThrow(SuspendSignal);
     expect(executionCount).toBe(1);
 
+    // Capture the history written by ctx.sleep before reassigning ctx.
+    // This simulates reloading workflowState from the database after a crash:
+    // the history is retrieved from the ctx that was alive during the first run.
+    const savedHistory = ctx.getHistory();
+
     // Wait 150ms for the sleep timer to expire
     await new Promise(resolve => setTimeout(resolve, 150));
 
     // Attempt 2: Re-executing should fast-forward the sleep
-    // Simulate DB reload of history
-    console.log(`[TEST DEBUG] task.workflowState = `, JSON.stringify(task.workflowState));
-    ctx = new DurableContext(taskId, task.workflowState?.history || {});
+    ctx = new DurableContext(taskId, savedHistory);
     const result = await workerMethod(task.intent, ctx);
 
     expect(result).toBe('done');

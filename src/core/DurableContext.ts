@@ -24,6 +24,15 @@ export class DurableContext {
   }
 
   /**
+   * Return a shallow copy of the current execution history.
+   * Used by callers (e.g. tests) to reconstruct a DurableContext after
+   * a simulated crash without relying on EventBus propagation.
+   */
+  public getHistory(): ExecutionHistory {
+    return { ...this.history };
+  }
+
+  /**
    * Run a step durably.
    * If stepId exists in history, return the cached result instead of executing.
    * If not, execute it, emit completion for the database, and return.

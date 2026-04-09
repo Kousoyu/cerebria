@@ -6,13 +6,20 @@
 import { LLMProvider, ChatMessage, LLMConfig } from './LLMProvider';
 import EventBus from '../core/EventBus';
 
+export interface AgentEngineOptions extends LLMConfig {
+  /** Maximum reasoning iterations before the loop is aborted. Default: 10 */
+  maxIterations?: number;
+}
+
 export class AgentEngine {
   private llm: LLMProvider;
   private system: any; // Context to Cerebria system instance
+  private maxIterations: number;
 
-  constructor(system: any, config: LLMConfig) {
+  constructor(system: any, config: AgentEngineOptions) {
     this.system = system;
     this.llm = new LLMProvider(config);
+    this.maxIterations = config.maxIterations ?? 10;
   }
 
   /**
@@ -30,8 +37,17 @@ export class AgentEngine {
 
     let synthesisComplete = false;
     let finalResponse = '';
+    let iterations = 0;
 
     while (!synthesisComplete) {
+      if (iterations >= this.maxIterations) {
+        throw new Error(
+          `[AgentEngine] Reasoning loop exceeded maxIterations (${this.maxIterations}). ` +
+          'The LLM may be stuck in a tool-call cycle.'
+        );
+      }
+      iterations++;
+
       console.log(`[AgentEngine] 🧠 Thinking... (${messages.length} msgs in context)`);
       EventBus.getInstance().emit('agent:thought', { action: 'thinking', messageCount: messages.length });
       const response = await this.llm.invoke(messages, availableTools);
@@ -83,7 +99,8 @@ export class AgentEngine {
   }
 
   /**
-   * Utility to wait for the persistent OS execution thread to finish
+   * Utility to wait for the persistent OS execution thread to finish.
+   * Cleans up event listeners in all exit paths (resolve, reject, timeout).
    */
   private waitForTaskCompletion(taskId: string): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -104,13 +121,14 @@ export class AgentEngine {
       const cleanup = () => {
         EventBus.getInstance().off('task:resumed', onResume);
         EventBus.getInstance().off('task:failed', onFailed);
+        clearTimeout(timeoutHandle);
       };
 
       EventBus.getInstance().on('task:resumed', onResume);
       EventBus.getInstance().on('task:failed', onFailed);
       
       // We set the ceiling timeout slightly above WorkerPool's inner bounds
-      setTimeout(() => {
+      const timeoutHandle = setTimeout(() => {
         cleanup();
         reject(new Error(`Kernel Task [${taskId}] timed out. Executor failed to return.`));
       }, 65000);

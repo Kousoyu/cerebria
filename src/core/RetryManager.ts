@@ -1,13 +1,16 @@
-// @ts-nocheck
 /**
  * RetryManager - Automatic Retry with Exponential Backoff
  */
 
+export interface RetryOptions {
+  maxRetries?: number;
+  delay?: number;
+}
+
 class RetryManager {
-  [key: string]: any;
-  static async retry(fn, options = {}) {
-    const maxRetries = options.maxRetries || 3;
-    const delay = options.delay || 1000;
+  static async retry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
+    const maxRetries = options.maxRetries ?? 3;
+    const delay = options.delay ?? 1000;
 
     for (let i = 0; i < maxRetries; i++) {
       try {
@@ -16,9 +19,11 @@ class RetryManager {
         if (i === maxRetries - 1) {
           throw error;
         }
-        await new Promise((r) => setTimeout(r, delay * Math.pow(2, i)));
+        await new Promise<void>((r) => setTimeout(r, delay * Math.pow(2, i)));
       }
     }
+    // Unreachable, but satisfies the compiler
+    throw new Error('RetryManager: exhausted all retries');
   }
 }
 
